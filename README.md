@@ -48,7 +48,7 @@ These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
 Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run everything.
 ````
-sudo apt-get install jq
+sudo apt-get install jq psmisc
 sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
