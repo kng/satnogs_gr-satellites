@@ -11,33 +11,29 @@ It also creates a list of supported sats in the temp dir for faster access betwe
 The post-obs stops the gr_satellites and looks for kiss data, parses and creates the necessary files for upload via the satnogs-client.
 
 ## Installation
-Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html
-Also worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/
+Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
+Also worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
+`git clone --depth=1 https://github.com/kng/satnogs_gr-satellites.git`
 
 Make sure the individual programs work before you enable the automated process!<br>
 These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
-Upload the grsat-wrapper.sh and kiss_satnogs.py to /usr/local/bin<br>
+Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run everything.
+````
+sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
+sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
+````
 
 Enable the pre/post observation scripts in satnogs-setup and put them in the appropriate location. The variables in the curly braces is sent to the script as arguments.
 
 `SATNOGS_PRE_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-In the file /usr/local/bin/satnogs-pre:
-````
-#!/bin/bash
-/usr/local/bin/grsat-wrapper.sh start "$@"
-````
-
 `SATNOGS_POST_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-In the file /usr/local/bin/satnogs-post:
-````
-#!/bin/bash
-/usr/local/bin/grsat-wrapper.sh stop "$@"
-````
 
-Don't forget to set the executable bit on the scripts:
+
+As of current version on the satnogs-flowgraphs 1.2.2 you will also need to replace the satnogs_bpsk.py in /usr/bin<br>
 ````
-sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
+sudo cp satnogs_bpsk.py /usr/bin
+sudo chmod 0755 /usr/bin/satnogs_bpsk.py
 ````
 
 ## References
