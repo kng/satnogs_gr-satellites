@@ -14,6 +14,7 @@ The post-obs stops the gr_satellites and looks for kiss data, parses and creates
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
 Basically this, ymmv:
 ````
+cd
 sudo apt-get install swig liborc-0.4-0 python3-pip feh
 sudo pip3 install --upgrade construct requests
 git clone --depth=1 https://github.com/daniestevez/gr-satellites.git
@@ -24,12 +25,17 @@ cmake ..
 make
 sudo make install
 sudo ldconfig
-````
 
-Probably worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
+cd
+git clone --depth=1 https://github.com/daniestevez/ssdv
+cd ssdv
+make
+sudo make install
+````
 
 Clone this repo and enter it:<br>
 ````
+cd
 git clone --depth=1 https://github.com/kng/satnogs_gr-satellites.git
 cd satnogs_gr-satellites
 ````
@@ -39,12 +45,14 @@ These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
 Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run everything.
 ````
-sudo apt-get install jq ssdv
+sudo apt-get install jq
 sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
 
 As of current version on the satnogs-flowgraphs 1.2.2 you will also need to replace the satnogs_bpsk.py in /usr/bin<br>
+Probably worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
+Use the bpsk_udp.png as reference to make this change in newer versions. Check the diff between the original satnogs_bpsk.py and your newly generated one.<br>
 ````
 sudo cp satnogs_bpsk.py /usr/bin
 sudo chmod 0755 /usr/bin/satnogs_bpsk.py
