@@ -21,14 +21,14 @@ Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run e
 
 Enable the pre/post observation scripts in satnogs-setup and put them in the appropriate location. The variables in the curly braces is sent to the script as arguments.
 
-SATNOGS_PRE_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}<br>
+`SATNOGS_PRE_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 In the file /usr/local/bin/satnogs-pre:
 ````
 #!/bin/bash
 /usr/local/bin/grsat-wrapper.sh start "$@"
 ````
 
-SATNOGS_POST_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}<br>
+`SATNOGS_POST_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 In the file /usr/local/bin/satnogs-post:
 ````
 #!/bin/bash
@@ -59,7 +59,7 @@ https://gitlab.com/librespacefoundation/satnogs/satnogs-client/-/blob/1.4/satnog
 JY1-sat image decoding:<br>
 https://destevez.net/2019/04/decoding-ssdv-from-jy1sat/
 
-Modified show_kiss parser from Fabian Schmidt:<br<
+Modified show_kiss parser from Fabian Schmidt:<br>
 https://github.com/kerel-fs/
 
 Issues and features:<br>
