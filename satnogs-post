@@ -1,0 +1,5 @@
+#!/bin/bash
+# SATNOGS_POST_OBSERVATION_SCRIPT
+# /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}
+
+/usr/local/bin/grsat-wrapper.sh stop "$@"
