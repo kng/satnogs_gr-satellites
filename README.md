@@ -11,6 +11,7 @@ It also creates a list of supported sats in the temp dir for faster access betwe
 The post-obs stops the gr_satellites and looks for kiss data, parses and creates the necessary files for upload via the satnogs-client.
 
 ## Installation
+Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
 Basically this, ymmv:
 ````
