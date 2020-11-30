@@ -10,6 +10,8 @@ The pre-obs script launches gr-satellites in the background and it’s output is
 It also creates a list of supported sats in the temp dir for faster access between runs.<br>
 The post-obs stops the gr_satellites and looks for kiss data, parses and creates the necessary files for upload via the satnogs-client.
 
+So in short, the path implemented: satnogs-flowgraphs -> udp audio (gqrx) -> decoder -> kiss -> kiss_satnogs for the binary extraction -> satnogs-client posting to the db. 
+
 ## Installation
 Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
