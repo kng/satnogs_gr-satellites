@@ -12,29 +12,48 @@ The post-obs stops the gr_satellites and looks for kiss data, parses and creates
 
 ## Installation
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
-Also worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
-`git clone --depth=1 https://github.com/kng/satnogs_gr-satellites.git`
+Basically this, ymmv:
+````
+sudo apt-get install swig liborc-0.4-0 python3-pip feh
+sudo pip3 install --upgrade construct requests
+git clone --depth=1 https://github.com/daniestevez/gr-satellites.git
+cd gr-satellites
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+sudo ldconfig
+````
+
+Probably worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
+
+Clone this repo and enter it:<br>
+````
+git clone --depth=1 https://github.com/kng/satnogs_gr-satellites.git
+cd satnogs_gr-satellites
+````
 
 Make sure the individual programs work before you enable the automated process!<br>
 These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
 Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run everything.
 ````
+sudo apt-get install jq ssdv
 sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
-
-Enable the pre/post observation scripts in satnogs-setup and put them in the appropriate location. The variables in the curly braces is sent to the script as arguments.
-
-`SATNOGS_PRE_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-`SATNOGS_POST_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-
 
 As of current version on the satnogs-flowgraphs 1.2.2 you will also need to replace the satnogs_bpsk.py in /usr/bin<br>
 ````
 sudo cp satnogs_bpsk.py /usr/bin
 sudo chmod 0755 /usr/bin/satnogs_bpsk.py
 ````
+
+Enable the pre/post observation scripts in satnogs-setup and put them in the appropriate location. The variables in the curly braces is sent to the script as arguments.
+
+`SATNOGS_PRE_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+`SATNOGS_POST_OBSERVATION_SCRIPT = /usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 
 ## References
 
