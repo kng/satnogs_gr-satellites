@@ -16,7 +16,9 @@ SATLIST="$TMP/grsat_list.txt"  # SATNOGS_APP_PATH
 LOG="$TMP/grsat_$ID.log"
 TLM="$TMP/grsat_$ID.tlm"
 KSS="$TMP/grsat_$ID.kss"
+GRPID="$TMP/grsat.pid"
 DATA="$TMP/data"   # SATNOGS_OUTPUT_PATH
+KEEPLOGS=no       # yes = keep, all other = remove TLM KSS LOG
 
 #DATE format fudge Y-m-dTH-M-S to Y-m-dTH:M:S
 B=${DATE//-/:}
@@ -36,24 +38,18 @@ if [ "$CMD" == "start" ]; then
 
   if grep -Fxq "$NORAD" "$SATLIST"; then
     echo "$PRG Starting observation $ID"
-    case "$NORAD" in
-    43803)  # JY1SAT
-      echo "$PRG Decoding JY1SAT"
-      gr_satellites "$NORAD" --clk_limit 0.03 --samp_rate 48000 --f_offset 12000 --throttle --udp --start_time "$DATEF" --kiss_out "$KSS" > "$LOG" &
-      ;;
-    42017)  # NAYIF-1
-      echo "$PRG Decoding NAYIF-1"
-      gr_satellites "$NORAD" --clk_limit 0.03 --samp_rate 48000 --f_offset 12000 --throttle --udp --start_time "$DATEF" --telemetry_output "$TLM" --kiss_out "$KSS" > "$LOG" &
-      ;;
-    39444)  # FUNCUBE-1
-      echo "$PRG Decoding FUNCUBE-1"
-      gr_satellites "$NORAD" --clk_limit 0.03 --samp_rate 48000 --f_offset 12000 --throttle --udp --start_time "$DATEF" --telemetry_output "$TLM" --kiss_out "$KSS" > "$LOG" &
+    GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS"
+    case ${SCRIPT^^} in
+    *BPSK*)
+      echo "$PRG using bpsk settings"
+      GROPT="$GROPT --clk_limit 0.03 --f_offset 12000"
       ;;
     *)
-      echo "$PRG Decoding default"
-      gr_satellites "$NORAD" --samp_rate 48000 --throttle --udp --start_time "$DATEF" --kiss_out "$KSS" > "$LOG" &
+      echo "$PRG using default settings"
       ;;
     esac
+    gr_satellites $GROPT > "$LOG" 2>> "$LOG" &
+    echo $! > "$GRPID"
   else
     echo "$PRG Satellite not supported"
   fi
@@ -61,7 +57,10 @@ fi
 
 if [ "$CMD" == "stop" ]; then
   echo "$PRG Stopping observation $ID"
-  killall -q -9 gr_satellites
+  if [ -f "$GRPID" ]; then
+    kill `cat "$GRPID"`
+    rm -f "$GRPID"
+  fi
 
   if [ -s "$TLM" ]; then
     echo "$PRG Got some telemetry!"
@@ -86,6 +85,12 @@ if [ "$CMD" == "stop" ]; then
     echo "$PRG Got something in the log!"
   else
     rm -f "$LOG"
+  fi
+
+  if [ ${KEEPLOGS^^} == "YES" ]; then
+    echo "$PRG Keeping logs, you need to purge them manually."
+  else
+    rm -f "$LOG" "$KSS" "$TLM"
   fi
 fi
 
