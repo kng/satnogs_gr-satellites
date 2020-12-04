@@ -13,7 +13,10 @@ baudrate=9600
 script='satnogs_fm.py'
 
 if len(sys.argv) == 2 or len(sys.argv) == 3:
-    baudrate = int(float(sys.argv[1]))  # example: 1200 or 1200.0
+    try:
+        baudrate = int(float(sys.argv[1]))  # example: 1200 or 1200.0
+    except ValueError:
+        baudrate = 9600
 if len(sys.argv) == 3:
     script = sys.argv[2]
 
