@@ -87,6 +87,7 @@ https://destevez.net/2019/04/decoding-ssdv-from-jy1sat/
 
 Modified show_kiss parser from Fabian Schmidt:<br>
 https://github.com/kerel-fs/
+https://gist.githubusercontent.com/kerel-fs/910738286c4fed9409550b4efb34cab6/raw/263c2df701e632980021048792e9b39db74cfe09/show_kiss_timestamp.py
 
 Issues and features:<br>
 https://github.com/daniestevez/gr-satellites/issues/196<br>
