@@ -53,7 +53,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [236, 23]
+    coordinate: [216, 24]
     rotation: 0
     state: true
 - name: if_freq
@@ -65,7 +65,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [883, 20]
+    coordinate: [587, 21]
     rotation: 0
     state: true
 - name: sps
@@ -80,37 +80,25 @@ blocks:
     coordinate: [517, 23]
     rotation: 0
     state: enabled
-- name: target_rate
-  id: variable
-  parameters:
-    comment: ''
-    value: baudrate*decimation
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [592, 21]
-    rotation: 0
-    state: enabled
 - name: analog_agc2_xx_0
   id: analog_agc2_xx
   parameters:
     affinity: ''
     alias: ''
-    attack_rate: 1e-3
+    attack_rate: 1e-2
     comment: ''
     decay_rate: 1e-3
     gain: '1.0'
     max_gain: '65536'
     maxoutbuf: '0'
     minoutbuf: '0'
-    reference: '0.5'
+    reference: '1.5e-2'
     type: complex
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 237]
+    coordinate: [711, 350]
     rotation: 0
     state: enabled
 - name: analog_agc2_xx_0_0
@@ -131,7 +119,28 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 359]
+    coordinate: [669, 549]
+    rotation: 0
+    state: enabled
+- name: analog_agc2_xx_0_1
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: 1e-3
+    comment: ''
+    decay_rate: 1e-3
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '0.5'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [234, 549]
     rotation: 0
     state: enabled
 - name: baudrate
@@ -148,25 +157,25 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [324, 23]
+    coordinate: [317, 22]
     rotation: 0
     state: enabled
-- name: blocks_complex_to_float_0
-  id: blocks_complex_to_float
+- name: blocks_complex_to_interleaved_short_0
+  id: blocks_complex_to_interleaved_short
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    vlen: '1'
+    vector_output: 'False'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 215]
+    coordinate: [1055, 382]
     rotation: 0
-    state: true
+    state: enabled
 - name: blocks_complex_to_real_0
   id: blocks_complex_to_real
   parameters:
@@ -180,7 +189,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [716, 356]
+    coordinate: [1058, 546]
     rotation: 180
     state: enabled
 - name: blocks_file_source_0
@@ -213,51 +222,15 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    scale: '32767.0'
+    scale: '16383.0'
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [723, 312]
+    coordinate: [1068, 503]
     rotation: 0
     state: enabled
-- name: blocks_float_to_short_1
-  id: blocks_float_to_short
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    scale: '32767.0'
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [841, 227]
-    rotation: 0
-    state: true
-- name: blocks_interleave_0
-  id: blocks_interleave
-  parameters:
-    affinity: ''
-    alias: ''
-    blocksize: '1'
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    num_streams: '2'
-    type: float
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [685, 215]
-    rotation: 0
-    state: true
 - name: blocks_interleaved_short_to_complex_0
   id: blocks_interleaved_short_to_complex
   parameters:
@@ -293,6 +266,24 @@ blocks:
     coordinate: [583, 136]
     rotation: 0
     state: true
+- name: blocks_multiply_const_vxx_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '16383'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [884, 382]
+    rotation: 0
+    state: enabled
 - name: blocks_rotator_cc_0_0
   id: blocks_rotator_cc
   parameters:
@@ -306,7 +297,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 391]
+    coordinate: [1030, 581]
     rotation: 0
     state: enabled
 - name: blocks_throttle_1
@@ -325,7 +316,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [768, 136]
+    coordinate: [761, 136]
     rotation: 0
     state: enabled
 - name: blocks_udp_sink_0
@@ -339,8 +330,8 @@ blocks:
 
       Select if_freq to suit you needs, 12000 or 1500'
     eof: 'True'
-    ipaddr: udp_IP
-    port: udp_port
+    ipaddr: udp_dest_audio
+    port: udp_port_audio
     psize: '1472'
     type: short
     vlen: '1'
@@ -348,7 +339,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1008, 327]
+    coordinate: [1240, 479]
     rotation: 0
     state: true
 - name: blocks_udp_sink_0_0
@@ -358,8 +349,8 @@ blocks:
     alias: ''
     comment: 'made for: gr-satellites --iq --udp'
     eof: 'True'
-    ipaddr: udp_IP
-    port: udp_port-1
+    ipaddr: udp_dest_iq
+    port: udp_port_iq
     psize: '1472'
     type: short
     vlen: '1'
@@ -367,7 +358,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1007, 203]
+    coordinate: [1242, 358]
     rotation: 0
     state: true
 - name: import_0
@@ -417,7 +408,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [496, 343]
+    coordinate: [837, 533]
     rotation: 0
     state: enabled
 - name: pfb_arb_resampler_xxx_0
@@ -438,7 +429,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [39, 367]
+    coordinate: [408, 557]
     rotation: 0
     state: enabled
 - name: raw_file
@@ -455,27 +446,48 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [120, 149]
+    coordinate: [12, 245]
     rotation: 0
     state: enabled
-- name: udp_IP
+- name: udp_dest_audio
   id: parameter
   parameters:
     alias: ''
-    comment: ''
+    comment: 'set to 127.0.0.1 to activate
+
+      empty to deactivate'
     hide: none
     label: ''
-    short_id: ''
+    short_id: a
     type: str
-    value: '"127.0.0.1"'
+    value: 127.0.0.1
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [691, 21]
+    coordinate: [1250, 233]
     rotation: 0
     state: enabled
-- name: udp_port
+- name: udp_dest_iq
+  id: parameter
+  parameters:
+    alias: ''
+    comment: 'set to 127.0.0.1 to activate
+
+      empty to deactivate'
+    hide: none
+    label: ''
+    short_id: q
+    type: str
+    value: 127.0.0.1
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1247, 97]
+    rotation: 0
+    state: enabled
+- name: udp_port_audio
   id: parameter
   parameters:
     alias: ''
@@ -489,7 +501,24 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [788, 21]
+    coordinate: [1138, 233]
+    rotation: 0
+    state: enabled
+- name: udp_port_iq
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: ''
+    short_id: ''
+    type: intx
+    value: '7356'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1154, 111]
     rotation: 0
     state: enabled
 - name: virtual_sink_0
@@ -502,7 +531,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [940, 136]
+    coordinate: [957, 136]
     rotation: 0
     state: true
 - name: virtual_source_0
@@ -515,28 +544,40 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 269]
+    coordinate: [472, 382]
+    rotation: 0
+    state: true
+- name: virtual_source_0_0
+  id: virtual_source
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: doppler_corrected
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [7, 581]
     rotation: 0
     state: true
 
 connections:
-- [analog_agc2_xx_0, '0', blocks_complex_to_float_0, '0']
-- [analog_agc2_xx_0, '0', pfb_arb_resampler_xxx_0, '0']
+- [analog_agc2_xx_0, '0', blocks_multiply_const_vxx_1, '0']
 - [analog_agc2_xx_0_0, '0', low_pass_filter_0_0, '0']
-- [blocks_complex_to_float_0, '0', blocks_interleave_0, '0']
-- [blocks_complex_to_float_0, '1', blocks_interleave_0, '1']
+- [analog_agc2_xx_0_1, '0', pfb_arb_resampler_xxx_0, '0']
+- [blocks_complex_to_interleaved_short_0, '0', blocks_udp_sink_0_0, '0']
 - [blocks_complex_to_real_0, '0', blocks_float_to_short_0, '0']
 - [blocks_file_source_0, '0', blocks_interleaved_short_to_complex_0, '0']
 - [blocks_float_to_short_0, '0', blocks_udp_sink_0, '0']
-- [blocks_float_to_short_1, '0', blocks_udp_sink_0_0, '0']
-- [blocks_interleave_0, '0', blocks_float_to_short_1, '0']
 - [blocks_interleaved_short_to_complex_0, '0', blocks_multiply_const_vxx_0, '0']
 - [blocks_multiply_const_vxx_0, '0', blocks_throttle_1, '0']
+- [blocks_multiply_const_vxx_1, '0', blocks_complex_to_interleaved_short_0, '0']
 - [blocks_rotator_cc_0_0, '0', blocks_complex_to_real_0, '0']
 - [blocks_throttle_1, '0', virtual_sink_0, '0']
 - [low_pass_filter_0_0, '0', blocks_rotator_cc_0_0, '0']
 - [pfb_arb_resampler_xxx_0, '0', analog_agc2_xx_0_0, '0']
 - [virtual_source_0, '0', analog_agc2_xx_0, '0']
+- [virtual_source_0_0, '0', analog_agc2_xx_0_1, '0']
 
 metadata:
   file_format: 1

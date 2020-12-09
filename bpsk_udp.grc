@@ -5,7 +5,7 @@ options:
     cmake_opt: ''
     comment: ''
     copyright: ''
-    description: BPSK decoder with UDP audio
+    description: BPSK decoder
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: no_gui
@@ -21,7 +21,7 @@ options:
     run_options: run
     sizing_mode: fixed
     thread_safe_setters: ''
-    title: satnogs_bpsk UDP
+    title: satnogs_bpsk
     window_size: 2*1080,1080
   states:
     bus_sink: false
@@ -173,7 +173,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [264, 476]
+    coordinate: [264, 476.0]
     rotation: 0
     state: enabled
 - name: analog_agc2_xx_0_0
@@ -194,7 +194,28 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [712, 476]
+    coordinate: [712, 476.0]
+    rotation: 0
+    state: enabled
+- name: analog_agc2_xx_0_1
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: 1e-2
+    comment: ''
+    decay_rate: 1e-3
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '1.5e-2'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [643, 1190]
     rotation: 0
     state: enabled
 - name: antenna
@@ -223,12 +244,12 @@ blocks:
     label: ''
     short_id: ''
     type: eng_float
-    value: '19000.0'
+    value: '9600.0'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1368, 20]
+    coordinate: [1368, 20.0]
     rotation: 0
     state: enabled
 - name: bb_freq
@@ -246,6 +267,22 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1680, 172.0]
+    rotation: 0
+    state: enabled
+- name: blocks_complex_to_interleaved_short_0
+  id: blocks_complex_to_interleaved_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vector_output: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [992, 1222]
     rotation: 0
     state: enabled
 - name: blocks_complex_to_real_0
@@ -272,15 +309,33 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    scale: '32767'
+    scale: '16383.0'
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1476, 425]
+    coordinate: [1478, 425]
     rotation: 0
-    state: true
+    state: enabled
+- name: blocks_multiply_const_vxx_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '16383'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [821, 1222]
+    rotation: 0
+    state: enabled
 - name: blocks_rotator_cc_0_0
   id: blocks_rotator_cc
   parameters:
@@ -306,10 +361,12 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    comment: ''
+    comment: 'Same output format as GQRX UDP Audio
+
+      For use with: gr-satellites --udp --f_offset 12000'
     eof: 'True'
-    ipaddr: udp_IP
-    port: '7355'
+    ipaddr: udp_dump_dest
+    port: udp_dump_port
     psize: '1472'
     type: short
     vlen: '1'
@@ -317,9 +374,53 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1657, 401]
+    coordinate: [1650, 401]
     rotation: 0
     state: true
+- name: blocks_udp_sink_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Int16 IQ dump
+
+      Use with: gr-satellites --udp --iq'
+    eof: 'True'
+    ipaddr: udp_dump_dest
+    port: udp_dump_port+1
+    psize: '1472'
+    type: short
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1179, 1198]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Complex IQ dump
+
+      For use with: strf via netcat
+
+      not enabled by default'
+    eof: 'True'
+    ipaddr: ''
+    port: udp_dump_port+2
+    psize: '1472'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [551, 301]
+    rotation: 0
+    state: enabled
 - name: bw
   id: parameter
   parameters:
@@ -710,7 +811,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 484]
+    coordinate: [464, 484.0]
     rotation: 0
     state: enabled
 - name: ppm
@@ -1024,7 +1125,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 85]
+    coordinate: [248, 100.0]
     rotation: 0
     state: true
 - name: stream_args
@@ -1078,6 +1179,46 @@ blocks:
     coordinate: [472, 828.0]
     rotation: 0
     state: enabled
+- name: udp_dump_dest
+  id: parameter
+  parameters:
+    alias: ''
+    comment: 'None to disable
+
+      127.0.0.1 to enable on loopback'
+    hide: none
+    label: ''
+    short_id: ''
+    type: str
+    value: 127.0.0.1
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1314, 1078]
+    rotation: 0
+    state: enabled
+- name: udp_dump_port
+  id: parameter
+  parameters:
+    alias: ''
+    comment: 'base port for audio
+
+      +1 for doppler iq
+
+      +2 for soapy source'
+    hide: none
+    label: ''
+    short_id: ''
+    type: intx
+    value: '7355'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1187, 1079]
+    rotation: 0
+    state: enabled
 - name: udp_port
   id: parameter
   parameters:
@@ -1121,6 +1262,19 @@ blocks:
     coordinate: [16, 508.0]
     rotation: 0
     state: true
+- name: virtual_source_0_0
+  id: virtual_source
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: doppler_corrected
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [409, 1222]
+    rotation: 0
+    state: true
 - name: waterfall_file_path
   id: parameter
   parameters:
@@ -1143,9 +1297,12 @@ connections:
 - [analog_agc2_xx_0, '0', low_pass_filter_0, '0']
 - [analog_agc2_xx_0, '0', pfb_arb_resampler_xxx_0, '0']
 - [analog_agc2_xx_0_0, '0', low_pass_filter_0_0, '0']
+- [analog_agc2_xx_0_1, '0', blocks_multiply_const_vxx_1, '0']
+- [blocks_complex_to_interleaved_short_0, '0', blocks_udp_sink_0_0, '0']
 - [blocks_complex_to_real_0, '0', blocks_float_to_short_0, '0']
 - [blocks_complex_to_real_0, '0', satnogs_ogg_encoder_0, '0']
 - [blocks_float_to_short_0, '0', blocks_udp_sink_0, '0']
+- [blocks_multiply_const_vxx_1, '0', blocks_complex_to_interleaved_short_0, '0']
 - [blocks_rotator_cc_0_0, '0', blocks_complex_to_real_0, '0']
 - [digital_constellation_receiver_cb_0, '0', satnogs_frame_decoder_0_0, '0']
 - [digital_pfb_clock_sync_xxx_0, '0', digital_constellation_receiver_cb_0, '0']
@@ -1157,10 +1314,12 @@ connections:
 - [satnogs_json_converter_0, out, satnogs_frame_file_sink_0_1_0, frame]
 - [satnogs_json_converter_0, out, satnogs_udp_msg_sink_0_0, in]
 - [satnogs_tcp_rigctl_msg_source_0, freq, satnogs_doppler_compensation_0, doppler]
+- [soapy_source_0, '0', blocks_udp_sink_0_0_0, '0']
 - [soapy_source_0, '0', satnogs_doppler_compensation_0, '0']
 - [virtual_source_0, '0', analog_agc2_xx_0, '0']
 - [virtual_source_0, '0', satnogs_iq_sink_0_0, '0']
 - [virtual_source_0, '0', satnogs_waterfall_sink_0_0, '0']
+- [virtual_source_0_0, '0', analog_agc2_xx_0_1, '0']
 
 metadata:
   file_format: 1

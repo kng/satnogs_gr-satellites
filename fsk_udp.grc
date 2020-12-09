@@ -6,7 +6,6 @@ options:
     comment: ''
     copyright: ''
     description: Generic FSK/MSK decoder supporting AX.25 and AX.100 framing schemes
-      with UDP audio
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: no_gui
@@ -22,7 +21,7 @@ options:
     run_options: run
     sizing_mode: fixed
     thread_safe_setters: ''
-    title: satnogs_fsk UDP
+    title: satnogs_fsk
     window_size: 2*1080,1080
   states:
     bus_sink: false
@@ -87,7 +86,7 @@ blocks:
     rs: 'True'
     sync_thrsh: '3'
     sync_word: '[0x93, 0x0B, 0x51, 0xDE]'
-    whitening: ' satnogs.whitening.make_ccsds()'
+    whitening: ' satnogs.whitening.make_ccsds(True)'
   states:
     bus_sink: false
     bus_source: false
@@ -101,7 +100,7 @@ blocks:
     comment: ''
     crc: satnogs.crc.CRC32_C
     descramble: 'True'
-    whitening: satnogs.whitening_make_ccsds()
+    whitening: satnogs.whitening_make_ccsds(True)
   states:
     bus_sink: false
     bus_source: false
@@ -124,6 +123,27 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [16, 1164.0]
+    rotation: 0
+    state: enabled
+- name: analog_agc2_xx_0_1
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: 1e-2
+    comment: ''
+    decay_rate: 1e-3
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '1.5e-2'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [997, 1031]
     rotation: 0
     state: enabled
 - name: analog_quadrature_demod_cf_0_0
@@ -225,6 +245,22 @@ blocks:
     coordinate: [1976, 156.0]
     rotation: 0
     state: enabled
+- name: blocks_complex_to_interleaved_short_0
+  id: blocks_complex_to_interleaved_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vector_output: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1346, 1063]
+    rotation: 0
+    state: enabled
 - name: blocks_delay_0
   id: blocks_delay
   parameters:
@@ -252,15 +288,15 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    scale: '32767'
+    scale: '16383.0'
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1802, 366]
+    coordinate: [1733, 338]
     rotation: 0
-    state: true
+    state: enabled
 - name: blocks_moving_average_xx_0
   id: blocks_moving_average_xx
   parameters:
@@ -279,6 +315,24 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [648, 572.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_const_vxx_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '16383'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1175, 1063]
     rotation: 0
     state: enabled
 - name: blocks_multiply_xx_0
@@ -304,10 +358,12 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    comment: ''
+    comment: 'Same output format as GQRX UDP Audio
+
+      For use with: gr-satellites --udp'
     eof: 'True'
-    ipaddr: udp_IP
-    port: '7355'
+    ipaddr: udp_dump_dest
+    port: udp_dump_port
     psize: '1472'
     type: short
     vlen: '1'
@@ -315,7 +371,51 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1983, 342]
+    coordinate: [1905, 314]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Int16 IQ dump
+
+      Use with: gr-satellites --udp --iq'
+    eof: 'True'
+    ipaddr: udp_dump_dest
+    port: udp_dump_port+1
+    psize: '1472'
+    type: short
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1533, 1039]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Complex IQ dump
+
+      For use with: strf via netcat
+
+      not enabled by default'
+    eof: 'True'
+    ipaddr: ''
+    port: udp_dump_port+2
+    psize: '1472'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [566, 340]
     rotation: 0
     state: true
 - name: blocks_vco_c_0
@@ -1086,6 +1186,42 @@ blocks:
     coordinate: [512, 780.0]
     rotation: 0
     state: enabled
+- name: udp_dump_dest
+  id: parameter
+  parameters:
+    alias: ''
+    comment: 'None to disable
+
+      127.0.0.1 to enable on loopback'
+    hide: none
+    label: ''
+    short_id: ''
+    type: str
+    value: 127.0.0.1
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1486, 924]
+    rotation: 0
+    state: enabled
+- name: udp_dump_port
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: ''
+    short_id: ''
+    type: intx
+    value: '7355'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1582, 924]
+    rotation: 0
+    state: enabled
 - name: udp_port
   id: parameter
   parameters:
@@ -1129,6 +1265,19 @@ blocks:
     coordinate: [40, 524.0]
     rotation: 0
     state: true
+- name: virtual_source_0_0
+  id: virtual_source
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: doppler_corrected
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [763, 1063]
+    rotation: 0
+    state: true
 - name: waterfall_file_path
   id: parameter
   parameters:
@@ -1148,12 +1297,15 @@ blocks:
     state: enabled
 
 connections:
+- [analog_agc2_xx_0_1, '0', blocks_multiply_const_vxx_1, '0']
 - [analog_quadrature_demod_cf_0_0, '0', dc_blocker_xx_0, '0']
 - [analog_quadrature_demod_cf_0_0_0, '0', pfb_arb_resampler_xxx_1, '0']
 - [analog_quadrature_demod_cf_0_0_0_0, '0', blocks_moving_average_xx_0, '0']
+- [blocks_complex_to_interleaved_short_0, '0', blocks_udp_sink_0_0, '0']
 - [blocks_delay_0, '0', blocks_multiply_xx_0, '0']
 - [blocks_float_to_short_0, '0', blocks_udp_sink_0, '0']
 - [blocks_moving_average_xx_0, '0', blocks_vco_c_0, '0']
+- [blocks_multiply_const_vxx_1, '0', blocks_complex_to_interleaved_short_0, '0']
 - [blocks_multiply_xx_0, '0', low_pass_filter_0, '0']
 - [blocks_vco_c_0, '0', blocks_multiply_xx_0, '1']
 - [dc_blocker_xx_0, '0', digital_clock_recovery_mm_xx_0, '0']
@@ -1170,11 +1322,13 @@ connections:
 - [satnogs_json_converter_0, out, satnogs_frame_file_sink_0_1_0, frame]
 - [satnogs_json_converter_0, out, satnogs_udp_msg_sink_0_0, in]
 - [satnogs_tcp_rigctl_msg_source_0, freq, satnogs_doppler_compensation_0, doppler]
+- [soapy_source_0_0, '0', blocks_udp_sink_0_0_0, '0']
 - [soapy_source_0_0, '0', satnogs_doppler_compensation_0, '0']
 - [virtual_source_0, '0', blocks_delay_0, '0']
 - [virtual_source_0, '0', low_pass_filter_0_0, '0']
 - [virtual_source_0, '0', satnogs_iq_sink_0, '0']
 - [virtual_source_0, '0', satnogs_waterfall_sink_0, '0']
+- [virtual_source_0_0, '0', analog_agc2_xx_0_1, '0']
 
 metadata:
   file_format: 1
