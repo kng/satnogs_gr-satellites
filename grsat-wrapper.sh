@@ -14,11 +14,20 @@ PRG="gr-satellites:"
 TMP="/tmp/.satnogs"
 SATLIST="$TMP/grsat_list.txt"  # SATNOGS_APP_PATH
 LOG="$TMP/grsat_$ID.log"
-TLM="$TMP/grsat_$ID.tlm"
 KSS="$TMP/grsat_$ID.kss"
 GRPID="$TMP/grsat.pid"
 DATA="$TMP/data"   # SATNOGS_OUTPUT_PATH
-KEEPLOGS=no       # yes = keep, all other = remove TLM KSS LOG
+
+# Settings
+KEEPLOGS=yes       # yes = keep, all other = remove KSS LOG
+
+# if IQ mode set, then you also need find_samp_rate.py
+IQMODE=no          # yes = use IQ UDP data, all other = use audio UDP data
+
+# uncomment and populate SELECTED with space separated norad id's
+# to selectively submit data to the network
+# if it's unset it will send all KISS demoded data, with possible dupes
+SELECTED="39444 44830 43803 42017 44832 40074"
 
 #DATE format fudge Y-m-dTH-M-S to Y-m-dTH:M:S
 B=${DATE//-/:}
@@ -28,9 +37,9 @@ SATNAME=$(echo "$TLE" | jq .tle0 | sed -e 's/ /_/g' | sed -e 's/[^A-Za-z0-9._-]/
 NORAD=$(echo "$TLE" | jq .tle2 | awk '{print $2}')
 echo "$PRG Observation: $ID, Norad: $NORAD, Name: $SATNAME, Script: $SCRIPT"
 
-exit 0
+#exit 0
 
-if [ "$CMD" == "start" ]; then
+if [ ${CMD^^} == "START" ]; then
   if [ ! -f "$SATLIST" ]; then
     echo "$PRG Generating satellite list"
     gr_satellites --list_satellites | sed  -n -Ee  's/.*NORAD[^0-9]([0-9]+).*/\1/p' > "$SATLIST"
@@ -38,59 +47,74 @@ if [ "$CMD" == "start" ]; then
 
   if grep -Fxq "$NORAD" "$SATLIST"; then
     echo "$PRG Starting observation $ID"
-    GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS"
-    case ${SCRIPT^^} in
-    *BPSK*)
-      echo "$PRG using bpsk settings"
-      GROPT="$GROPT --clk_limit 0.03 --f_offset 12000"
-      ;;
-    *)
-      echo "$PRG using default settings"
-      ;;
-    esac
-    gr_satellites $GROPT > "$LOG" 2>> "$LOG" &
+    if [ ${IQMODE^^} == "YES" ]; then
+      SAMP=`find_samp_rate.py $BAUD $SCRIPT`
+      if [ -z ${SAMP} ]; then SAMP=48000; fi # default 48k if script not found
+      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --start_time $DATEF --kiss_out $KSS"
+      case ${SCRIPT^^} in
+      *FSK*)
+        echo "$PRG using FSK settings"
+        GROPT="$GROPT --use_agc"
+        ;;
+      *)
+        echo "$PRG using default settings"
+        ;;
+      esac
+      echo "$PRG running in IQ mode"
+    else
+      GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS"
+      case ${SCRIPT^^} in
+      *BPSK*)
+        echo "$PRG using bpsk settings"
+        GROPT="$GROPT --clk_limit 0.03 --f_offset 12000"
+        ;;
+      *)
+        echo "$PRG using default settings"
+        ;;
+      esac
+      echo "$PRG running in audio mode"
+    fi
+    echo "$@" > "$LOG"
+    echo "$GROPT" >> "$LOG"
+    gr_satellites $GROPT >> "$LOG" 2>> "$LOG" &
     echo $! > "$GRPID"
   else
     echo "$PRG Satellite not supported"
   fi
 fi
 
-if [ "$CMD" == "stop" ]; then
+if [ ${CMD^^} == "STOP" ]; then
   echo "$PRG Stopping observation $ID"
   if [ -f "$GRPID" ]; then
     kill `cat "$GRPID"`
     rm -f "$GRPID"
   fi
 
-  if [ -s "$TLM" ]; then
-    echo "$PRG Got some telemetry!"
-  else
-    rm -f "$TLM"
-  fi
-  
   if [ -s "$KSS" ]; then
-    echo "$PRG Got some kiss data!"
-    if [ "$NORAD" == "43803" ]; then
-      jy1sat_ssdv "$KSS" "${TMP}/data_${ID}_${DATE}" >> "$LOG"
-      rm -f "${TMP}/data_${ID}_"*.ssdv
-      mv "${TMP}/data_${ID}_"* "$DATA"
+    if [ -z ${SELECTED+x} ] || [[ ${SELECTED} =~ ${NORAD} ]]; then
+      echo "$PRG processing KISS data to network"
+      if [ "$NORAD" == "43803" ]; then
+        jy1sat_ssdv "$KSS" "${TMP}/data_${ID}_${DATE}" >> "$LOG"
+        rm -f "${TMP}/data_${ID}_"*.ssdv
+        mv "${TMP}/data_${ID}_"* "$DATA"
+      else
+        kiss_satnogs.py "$KSS" "${DATA}/data_${ID}_" >> "$LOG"
+      fi
     else
-      kiss_satnogs.py "$KSS" "${DATA}/data_${ID}_"
+      echo "$PRG not sending KISS data to network"
     fi
   else
-    rm -f "$KSS"
+    rm -f "$KSS" # purge empty kiss file
   fi
 
-  if [ -s "$LOG" ]; then
-    echo "$PRG Got something in the log!"
-  else
+  if [ ! -s "$LOG" ]; then # purge empty logs
     rm -f "$LOG"
   fi
 
   if [ ${KEEPLOGS^^} == "YES" ]; then
     echo "$PRG Keeping logs, you need to purge them manually."
   else
-    rm -f "$LOG" "$KSS" "$TLM"
+    rm -f "$LOG" "$KSS"
   fi
 fi
 
