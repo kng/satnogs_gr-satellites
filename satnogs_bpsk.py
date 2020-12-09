@@ -1,13 +1,13 @@
-#! /usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: satnogs_bpsk UDP
+# Title: satnogs_bpsk
 # Author: Manolis Surligas (surligas@gmail.com), Patrick Dohmen (DL4PD)
-# Description: BPSK decoder with UDP audio
+# Description: BPSK decoder
 # GNU Radio version: 3.8.2.0
 
 from gnuradio import analog
@@ -31,8 +31,8 @@ from distutils import util
 
 class satnogs_bpsk(gr.top_block):
 
-    def __init__(self, antenna="", baudrate=9600.0, bb_freq=0.0, bw=0.0, dc_removal="False", decoded_data_file_path="/tmp/.satnogs/data/data", dev_args="", doppler_correction_per_sec=20, enable_iq_dump=0, excess_bw=0.5, file_path="test.wav", framing="ax25", gain=0.0, gain_mode="Overall", iq_file_path="/tmp/iq.dat", lo_offset=100e3, max_cfo=2000.0, other_settings="", ppm=0, rigctl_port=4532, rx_freq=100e6, samp_rate_rx=0.0, soapy_rx_device="driver=invalid", stream_args="", tune_args="", udp_IP="127.0.0.1", udp_port=16887, waterfall_file_path="/tmp/waterfall.dat"):
-        gr.top_block.__init__(self, "satnogs_bpsk UDP")
+    def __init__(self, antenna="", baudrate=9600.0, bb_freq=0.0, bw=0.0, dc_removal="False", decoded_data_file_path="/tmp/.satnogs/data/data", dev_args="", doppler_correction_per_sec=20, enable_iq_dump=0, excess_bw=0.5, file_path="test.wav", framing="ax25", gain=0.0, gain_mode="Overall", iq_file_path="/tmp/iq.dat", lo_offset=100e3, max_cfo=2000.0, other_settings="", ppm=0, rigctl_port=4532, rx_freq=100e6, samp_rate_rx=0.0, soapy_rx_device="driver=invalid", stream_args="", tune_args="", udp_IP="127.0.0.1", udp_dump_dest='127.0.0.1', udp_dump_port=7355, udp_port=16887, waterfall_file_path="/tmp/waterfall.dat"):
+        gr.top_block.__init__(self, "satnogs_bpsk")
 
         ##################################################
         # Parameters
@@ -63,6 +63,8 @@ class satnogs_bpsk(gr.top_block):
         self.stream_args = stream_args
         self.tune_args = tune_args
         self.udp_IP = udp_IP
+        self.udp_dump_dest = udp_dump_dest
+        self.udp_dump_port = udp_dump_port
         self.udp_port = udp_port
         self.waterfall_file_path = waterfall_file_path
 
@@ -165,10 +167,16 @@ class satnogs_bpsk(gr.top_block):
                 6.76))
         self.digital_pfb_clock_sync_xxx_0 = digital.pfb_clock_sync_ccf(sps, 2.0 * math.pi/100.0, rrc_taps, nfilts, nfilts/2, 1.5, 1)
         self.digital_constellation_receiver_cb_0 = digital.constellation_receiver_cb(bpsk_constellation, 2.0 * math.pi/100.0, -0.25, 0.25)
-        self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_short*1, udp_IP, 7355, 1472, True)
+        self.blocks_udp_sink_0_0_0 = blocks.udp_sink(gr.sizeof_gr_complex*1, '', udp_dump_port+2, 1472, True)
+        self.blocks_udp_sink_0_0 = blocks.udp_sink(gr.sizeof_short*1, udp_dump_dest, udp_dump_port+1, 1472, True)
+        self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_short*1, udp_dump_dest, udp_dump_port, 1472, True)
         self.blocks_rotator_cc_0_0 = blocks.rotator_cc(2.0 * math.pi * (if_freq / audio_samp_rate))
-        self.blocks_float_to_short_0 = blocks.float_to_short(1, 32767)
+        self.blocks_multiply_const_vxx_1 = blocks.multiply_const_cc(16383)
+        self.blocks_float_to_short_0 = blocks.float_to_short(1, 16383.0)
         self.blocks_complex_to_real_0 = blocks.complex_to_real(1)
+        self.blocks_complex_to_interleaved_short_0 = blocks.complex_to_interleaved_short(False)
+        self.analog_agc2_xx_0_1 = analog.agc2_cc(1e-2, 1e-3, 1.5e-2, 1.0)
+        self.analog_agc2_xx_0_1.set_max_gain(65536)
         self.analog_agc2_xx_0_0 = analog.agc2_cc(0.01, 0.001, 0.015, 1.0)
         self.analog_agc2_xx_0_0.set_max_gain(65536)
         self.analog_agc2_xx_0 = analog.agc2_cc(1e-3, 1e-3, 0.5, 1.0)
@@ -186,9 +194,12 @@ class satnogs_bpsk(gr.top_block):
         self.connect((self.analog_agc2_xx_0, 0), (self.low_pass_filter_0, 0))
         self.connect((self.analog_agc2_xx_0, 0), (self.pfb_arb_resampler_xxx_0, 0))
         self.connect((self.analog_agc2_xx_0_0, 0), (self.low_pass_filter_0_0, 0))
+        self.connect((self.analog_agc2_xx_0_1, 0), (self.blocks_multiply_const_vxx_1, 0))
+        self.connect((self.blocks_complex_to_interleaved_short_0, 0), (self.blocks_udp_sink_0_0, 0))
         self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_float_to_short_0, 0))
         self.connect((self.blocks_complex_to_real_0, 0), (self.satnogs_ogg_encoder_0, 0))
         self.connect((self.blocks_float_to_short_0, 0), (self.blocks_udp_sink_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_1, 0), (self.blocks_complex_to_interleaved_short_0, 0))
         self.connect((self.blocks_rotator_cc_0_0, 0), (self.blocks_complex_to_real_0, 0))
         self.connect((self.digital_constellation_receiver_cb_0, 0), (self.satnogs_frame_decoder_0_0, 0))
         self.connect((self.digital_pfb_clock_sync_xxx_0, 0), (self.digital_constellation_receiver_cb_0, 0))
@@ -196,8 +207,10 @@ class satnogs_bpsk(gr.top_block):
         self.connect((self.low_pass_filter_0_0, 0), (self.blocks_rotator_cc_0_0, 0))
         self.connect((self.pfb_arb_resampler_xxx_0, 0), (self.analog_agc2_xx_0_0, 0))
         self.connect((self.satnogs_doppler_compensation_0, 0), (self.analog_agc2_xx_0, 0))
+        self.connect((self.satnogs_doppler_compensation_0, 0), (self.analog_agc2_xx_0_1, 0))
         self.connect((self.satnogs_doppler_compensation_0, 0), (self.satnogs_iq_sink_0_0, 0))
         self.connect((self.satnogs_doppler_compensation_0, 0), (self.satnogs_waterfall_sink_0_0, 0))
+        self.connect((self.soapy_source_0, 0), (self.blocks_udp_sink_0_0_0, 0))
         self.connect((self.soapy_source_0, 0), (self.satnogs_doppler_compensation_0, 0))
 
 
@@ -371,6 +384,18 @@ class satnogs_bpsk(gr.top_block):
     def set_udp_IP(self, udp_IP):
         self.udp_IP = udp_IP
 
+    def get_udp_dump_dest(self):
+        return self.udp_dump_dest
+
+    def set_udp_dump_dest(self, udp_dump_dest):
+        self.udp_dump_dest = udp_dump_dest
+
+    def get_udp_dump_port(self):
+        return self.udp_dump_port
+
+    def set_udp_dump_port(self, udp_dump_port):
+        self.udp_dump_port = udp_dump_port
+
     def get_udp_port(self):
         return self.udp_port
 
@@ -453,7 +478,7 @@ class satnogs_bpsk(gr.top_block):
 
 
 def argument_parser():
-    description = 'BPSK decoder with UDP audio'
+    description = 'BPSK decoder'
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "--antenna", dest="antenna", type=str, default="",
@@ -534,6 +559,12 @@ def argument_parser():
         "--udp-IP", dest="udp_IP", type=str, default="127.0.0.1",
         help="Set udp_IP [default=%(default)r]")
     parser.add_argument(
+        "--udp-dump-dest", dest="udp_dump_dest", type=str, default='127.0.0.1',
+        help="Set udp_dump_dest [default=%(default)r]")
+    parser.add_argument(
+        "--udp-dump-port", dest="udp_dump_port", type=intx, default=7355,
+        help="Set udp_dump_port [default=%(default)r]")
+    parser.add_argument(
         "--udp-port", dest="udp_port", type=intx, default=16887,
         help="Set udp_port [default=%(default)r]")
     parser.add_argument(
@@ -545,7 +576,7 @@ def argument_parser():
 def main(top_block_cls=satnogs_bpsk, options=None):
     if options is None:
         options = argument_parser().parse_args()
-    tb = top_block_cls(antenna=options.antenna, baudrate=options.baudrate, bb_freq=options.bb_freq, bw=options.bw, dc_removal=options.dc_removal, decoded_data_file_path=options.decoded_data_file_path, dev_args=options.dev_args, doppler_correction_per_sec=options.doppler_correction_per_sec, enable_iq_dump=options.enable_iq_dump, excess_bw=options.excess_bw, file_path=options.file_path, framing=options.framing, gain=options.gain, gain_mode=options.gain_mode, iq_file_path=options.iq_file_path, lo_offset=options.lo_offset, max_cfo=options.max_cfo, other_settings=options.other_settings, ppm=options.ppm, rigctl_port=options.rigctl_port, rx_freq=options.rx_freq, samp_rate_rx=options.samp_rate_rx, soapy_rx_device=options.soapy_rx_device, stream_args=options.stream_args, tune_args=options.tune_args, udp_IP=options.udp_IP, udp_port=options.udp_port, waterfall_file_path=options.waterfall_file_path)
+    tb = top_block_cls(antenna=options.antenna, baudrate=options.baudrate, bb_freq=options.bb_freq, bw=options.bw, dc_removal=options.dc_removal, decoded_data_file_path=options.decoded_data_file_path, dev_args=options.dev_args, doppler_correction_per_sec=options.doppler_correction_per_sec, enable_iq_dump=options.enable_iq_dump, excess_bw=options.excess_bw, file_path=options.file_path, framing=options.framing, gain=options.gain, gain_mode=options.gain_mode, iq_file_path=options.iq_file_path, lo_offset=options.lo_offset, max_cfo=options.max_cfo, other_settings=options.other_settings, ppm=options.ppm, rigctl_port=options.rigctl_port, rx_freq=options.rx_freq, samp_rate_rx=options.samp_rate_rx, soapy_rx_device=options.soapy_rx_device, stream_args=options.stream_args, tune_args=options.tune_args, udp_IP=options.udp_IP, udp_dump_dest=options.udp_dump_dest, udp_dump_port=options.udp_dump_port, udp_port=options.udp_port, waterfall_file_path=options.waterfall_file_path)
 
     def sig_handler(sig=None, frame=None):
         tb.stop()
