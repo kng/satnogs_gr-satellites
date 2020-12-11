@@ -103,7 +103,7 @@ if __name__ == '__main__':
             framelen += len(frame)
             if ts == 0:
                 ts = timestamp
-        print('{}: Found {} frames, total data {}, first timestamp {}'.format(args.KISS_IN, len(frame_tuples),
+        print('{}: Found {} frames, total data {}, first timestamp {}'.format(args.i.name, len(frame_tuples),
                                                                               framelen, ts))
 
     elif args.t:
@@ -111,7 +111,7 @@ if __name__ == '__main__':
             print('{} len: {}'.format(timestamp, len(frame)))
             if args.v:
                 print('{}:\n{}\n'.format(timestamp, hexlify(frame).decode('latin-1')))
-        print('{}: Found {} frames.'.format(args.KISS_IN, len(frame_tuples)))
+        print('{}: Found {} frames.'.format(args.i.name, len(frame_tuples)))
 
     else:
         for (timestamp, frame) in frame_tuples:
@@ -128,4 +128,4 @@ if __name__ == '__main__':
             with open(datafile, 'wb') as df:
                 df.write(frame)
         if args.v:
-            print('{}: Wrote {} frames.'.format(args.KISS_IN, len(frame_tuples)))
+            print('{}: Wrote {} frames.'.format(args.i.name, len(frame_tuples)))
