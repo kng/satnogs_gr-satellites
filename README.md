@@ -15,6 +15,7 @@ So in short, the path implemented: satnogs-flowgraphs -> udp audio (gqrx) -> dec
 ## Installation
 Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
+The latest gr-satellites >=3.7.0-git with the --udp_raw and --ignore_unknown_args is required.<br>
 Basically this, ymmv:
 ````
 cd
@@ -55,6 +56,7 @@ sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/loca
 ````
 
 As of current version on the satnogs-flowgraphs 1.2.2 or 1.3 you will also need to replace the satnogs_bpsk.py in /usr/bin<br>
+Check the flowpgraphs-* directories in this repo for examples.<br>
 These absolutely have to match your installed versions, the change from 1.2 to 1.3 is incompatible with eachother.<br>
 Probably worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
 Use the bpsk_udp.png as reference to make this change in newer versions. Check the diff between the original satnogs_bpsk.py and your newly generated one.<br>
