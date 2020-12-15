@@ -27,7 +27,7 @@ IQMODE=no          # yes = use IQ UDP data, all other = use audio UDP data
 # uncomment and populate SELECTED with space separated norad id's
 # to selectively submit data to the network
 # if it's unset it will send all KISS demoded data, with possible dupes
-SELECTED="39444 44830 43803 42017 44832 40074"
+#SELECTED="39444 44830 43803 42017 44832 40074"
 
 #DATE format fudge Y-m-dTH-M-S to Y-m-dTH:M:S
 B=${DATE//-/:}
@@ -50,7 +50,7 @@ if [ ${CMD^^} == "START" ]; then
     if [ ${IQMODE^^} == "YES" ]; then
       SAMP=`find_samp_rate.py $BAUD $SCRIPT`
       if [ -z ${SAMP} ]; then SAMP=48000; fi # default 48k if script not found
-      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --start_time $DATEF --kiss_out $KSS"
+      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args"
       case ${SCRIPT^^} in
       *FSK*)
         echo "$PRG using FSK settings"
@@ -62,7 +62,7 @@ if [ ${CMD^^} == "START" ]; then
       esac
       echo "$PRG running in IQ mode"
     else
-      GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS"
+      GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS --ignore_unknown_args"
       case ${SCRIPT^^} in
       *BPSK*)
         echo "$PRG using bpsk settings"
