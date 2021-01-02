@@ -56,6 +56,11 @@ sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
 
+The GNU Radio UDP source need to have memory buffer increased for receiving more than the 48k audio stream, so if using IQ mode you will need to add the following:
+````
+sudo cp udp.conf /etc/gnuradio/conf.d/
+````
+
 As of current version on the satnogs-flowgraphs 1.3-1 you will also need to replace the satnogs_*.py in /usr/bin<br>
 Check the current version with `dpkg -l satnogs-flowgraphs`
 Make sure you are already on version 1.3-1 before running the following commands:
