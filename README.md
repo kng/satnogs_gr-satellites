@@ -48,31 +48,43 @@ Make sure the individual programs work before you enable the automated process!<
 These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
 If you plan to run with IQ data, you also need: find_samp_rate.py<br>
 Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
-Uncomment the “exit 0” on line 29 in the wrapper when you are ready to run everything.
+
 ````
 sudo apt-get install jq psmisc
 sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
 
-As of current version on the satnogs-flowgraphs 1.2.2 or 1.3 you will also need to replace the satnogs_bpsk.py in /usr/bin<br>
-Check the flowpgraphs-* directories in this repo for examples.<br>
-These absolutely have to match your installed versions, the change from 1.2 to 1.3 is incompatible with eachother.<br>
-Probably worth basing the change on a recent copy of the flowgraphs https://gitlab.com/librespacefoundation/satnogs/satnogs-flowgraphs/<br>
-Use the bpsk_udp.png as reference to make this change in newer versions. Check the diff between the original satnogs_bpsk.py and your newly generated one.<br>
+As of current version on the satnogs-flowgraphs 1.3-1 you will also need to replace the satnogs_*.py in /usr/bin<br>
+Check the current version with `dpkg -l satnogs-flowgraphs`
+Make sure you are already on version 1.3-1 before running the following commands:
 ````
-sudo cp satnogs_bpsk.py /usr/bin
-sudo chmod 0755 /usr/bin/satnogs_bpsk.py
+sudo dpkg -i satnogs-flowgraphs_1.3-1+sa2kng_all.deb
+````
+Run `sudo satnogs-setup` and set the following parameters under Advanced -> Software:<br>
+SATNOGS_CLIENT_URL = `git+https://gitlab.com/knegge/satnogs-client.git@sa2kng_station`<br>
+SATNOGS_RADIO_FLOWGRAPHS_VERSION =  `1.3-1+sa2kng`<br>
+And enable pre/post observation scripts under Advanced -> Scripts:<br>
+SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+
+Then update + apply, check the installed version is now 1.3-1+sa2kng.
+The last thing to do is activating the UDP streams, for now this needs to be done manually after every run of satnogs-setup as the file is generated.
+In /etc/default/satnogs-client:
+````
+UDP_DUMP_HOST="127.0.0.1"
 ````
 
-Enable the pre/post observation scripts in satnogs-setup and put them in the appropriate location. The variables in the curly braces is sent to the script as arguments.
-
-SATNOGS_PRE_OBSERVATION_SCRIPT = `/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-SATNOGS_POST_OBSERVATION_SCRIPT = `/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 
 ## References
 
-gr-satellites cli reference<br>
+My relevant project forks:<br>
+https://gitlab.com/knegge/satnogs-flowgraphs<br>
+https://gitlab.com/knegge/satnogs-client<br>
+https://gitlab.com/knegge/satnogs-client-ansible<br>
+https://gitlab.com/knegge/satnogs-config<br>
+
+gr-satellites cli reference:<br>
 https://gr-satellites.readthedocs.io/en/latest/command_line.html<br>
 https://github.com/daniestevez/gr-satellites<br>
 https://github.com/daniestevez/gr-frontends
