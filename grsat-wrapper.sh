@@ -15,11 +15,11 @@ TMP="/tmp/.satnogs"
 SATLIST="$TMP/grsat_list.txt"  # SATNOGS_APP_PATH
 LOG="$TMP/grsat_$ID.log"
 KSS="$TMP/grsat_$ID.kss"
-GRPID="$TMP/grsat.pid"
+GRPID="$TMP/grsat_$SATNOGS_STATION_ID.pid"
 DATA="$TMP/data"   # SATNOGS_OUTPUT_PATH
 
 # Settings
-KEEPLOGS=yes       # yes = keep, all other = remove KSS LOG
+KEEPLOGS=no       # yes = keep, all other = remove KSS LOG
 
 # if IQ mode set, then you also need find_samp_rate.py
 IQMODE=no          # yes = use IQ UDP data, all other = use audio UDP data
@@ -37,8 +37,6 @@ SATNAME=$(echo "$TLE" | jq .tle0 | sed -e 's/ /_/g' | sed -e 's/[^A-Za-z0-9._-]/
 NORAD=$(echo "$TLE" | jq .tle2 | awk '{print $2}')
 echo "$PRG Observation: $ID, Norad: $NORAD, Name: $SATNAME, Script: $SCRIPT"
 
-#exit 0
-
 if [ ${CMD^^} == "START" ]; then
   if [ ! -f "$SATLIST" ]; then
     echo "$PRG Generating satellite list"
@@ -49,34 +47,18 @@ if [ ${CMD^^} == "START" ]; then
     echo "$PRG Starting observation $ID"
     if [ ${IQMODE^^} == "YES" ]; then
       SAMP=`find_samp_rate.py $BAUD $SCRIPT`
-      if [ -z ${SAMP} ]; then SAMP=48000; fi # default 48k if script not found
-      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args"
-      case ${SCRIPT^^} in
-      *FSK*)
-        echo "$PRG using FSK settings"
-        GROPT="$GROPT --use_agc"
-        ;;
-      *)
-        echo "$PRG using default settings"
-        ;;
-      esac
-      echo "$PRG running in IQ mode"
+      if [ -z ${SAMP} ]; then  # default 48k if script not found
+        SAMP=48000
+        echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
+      fi
+      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc"
+      echo "$PRG running in IQ mode at $SAMP sps"
     else
-      GROPT="$NORAD --samp_rate 48000 --throttle --udp --start_time $DATEF --kiss_out $KSS --ignore_unknown_args"
-      case ${SCRIPT^^} in
-      *BPSK*)
-        echo "$PRG using bpsk settings"
-        GROPT="$GROPT --clk_limit 0.03 --f_offset 12000"
-        ;;
-      *)
-        echo "$PRG using default settings"
-        ;;
-      esac
-      echo "$PRG running in audio mode"
+      SAMP=48000
+      GROPT="$NORAD --samp_rate $SAMP --throttle --udp --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --f_offset 12000"  # --clk_limit 0.03
+      echo "$PRG running in audio mode at $SAMP sps"
     fi
-    echo "$@" > "$LOG"
-    echo "$GROPT" >> "$LOG"
-    gr_satellites $GROPT >> "$LOG" 2>> "$LOG" &
+    gr_satellites $GROPT > "$LOG" 2>> "$LOG" &
     echo $! > "$GRPID"
   else
     echo "$PRG Satellite not supported"
@@ -84,8 +66,8 @@ if [ ${CMD^^} == "START" ]; then
 fi
 
 if [ ${CMD^^} == "STOP" ]; then
-  echo "$PRG Stopping observation $ID"
   if [ -f "$GRPID" ]; then
+    echo "$PRG Stopping observation $ID"
     kill `cat "$GRPID"`
     rm -f "$GRPID"
   fi
