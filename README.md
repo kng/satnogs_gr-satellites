@@ -6,11 +6,12 @@ The main idea is to implement the UDP audio output in the satnogs_xxxx.grc to ge
 UDP data should be the same as GQRX produces and is supported directly with gr-satellites and some other programs<br>
 See this for more information on the UDP protocol and examples https://gqrx.dk/doc/streaming-audio-over-udp
 
-The pre-obs script launches gr-satellites in the background and it’s output is directed to /tmp/.satnogs/grsat_ID.log, grsat_ID.tlm, grsat_ID.kss<br>
+The pre-obs script launches gr-satellites in the background and it’s output is directed to /tmp/.satnogs/grsat_ID.log, grsat_ID.kss<br>
 It also creates a list of supported sats in the temp dir for faster access between runs.<br>
 The post-obs stops the gr_satellites and looks for kiss data, parses and creates the necessary files for upload via the satnogs-client.
 
-So in short, the path implemented: satnogs-flowgraphs -> udp audio (gqrx) -> decoder -> kiss -> kiss_satnogs for the binary extraction -> satnogs-client posting to the db. 
+So in short, the path implemented: satnogs-flowgraphs -> udp audio (gqrx) -> decoder -> kiss -> kiss_satnogs for the binary extraction -> satnogs-client posting to the db.<br>
+The newer version of the flowgraphs also has UDP IQ data on UDP_DUMP_PORT+1 (default 7356).
 
 ## Installation
 Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
@@ -45,12 +46,12 @@ cd satnogs_gr-satellites
 ````
 
 Make sure the individual programs work before you enable the automated process!<br>
-These are required: jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py<br>
-If you plan to run with IQ data, you also need: find_samp_rate.py<br>
+These are required: `jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py`<br>
+If you plan to run with IQ data, you also need: `find_samp_rate.py`<br>
 Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 
 ````
-sudo apt-get install jq psmisc
+sudo apt-get install jq
 sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
 ````
@@ -75,6 +76,33 @@ In /etc/default/satnogs-client:
 UDP_DUMP_HOST="127.0.0.1"
 ````
 
+## Configuration options
+
+Inside the script `grsat-wrapper.sh` there's some options. 
+````
+# Settings
+KEEPLOGS=no       # yes = keep, all other = remove KSS LOG
+
+# if IQ mode set, then you also need find_samp_rate.py
+IQMODE=no          # yes = use IQ UDP data, all other = use audio UDP data
+
+# uncomment and populate SELECTED with space separated norad id's
+# to selectively submit data to the network
+# if it's unset it will send all KISS demoded data, with possible dupes
+SELECTED="39444 44830 43803 42017 44832 40074"
+````
+
+It is also totally possible to add other demodulating software to the main script. Check the previous versions of the grsat-wrapper.sh to see some examples on how it worked in earlier releases.<br>
+Examples on how to use the UDP audio: https://gqrx.dk/doc/streaming-audio-over-udp
+
+## Deactivation/Uninstall
+
+To revert the installation, simply clear out the four variables with satnogs-setup:<br>
+`SATNOGS_CLIENT_URL SATNOGS_RADIO_FLOWGRAPHS_VERSION SATNOGS_PRE_OBSERVATION_SCRIPT SATNOGS_POST_OBSERVATION_SCRIPT`<br>
+Then update + apply.
+
+If you want to you can remove the scripts installed:<br>
+`cd /usr/local/bin && sudo rm -f find_samp_rate.py grsat-wrapper.sh kiss_satnogs.py satnogs-post satnogs-pre`
 
 ## References
 
