@@ -37,6 +37,14 @@ SATNAME=$(echo "$TLE" | jq .tle0 | sed -e 's/ /_/g' | sed -e 's/[^A-Za-z0-9._-]/
 NORAD=$(echo "$TLE" | jq .tle2 | awk '{print $2}')
 echo "$PRG Observation: $ID, Norad: $NORAD, Name: $SATNAME, Script: $SCRIPT"
 
+if [[ $UDP_DUMP_PORT == ?(-)+([0-9]) ]]; then
+        AUDIO_PORT=$UDP_DUMP_PORT
+        IQ_PORT=$((UDP_DUMP_PORT + 1))
+else
+        AUDIO_PORT=7355
+        IQ_PORT=7356
+fi
+
 if [ ${CMD^^} == "START" ]; then
   if [ ! -f "$SATLIST" ]; then
     echo "$PRG Generating satellite list"
@@ -51,11 +59,11 @@ if [ ${CMD^^} == "START" ]; then
         SAMP=48000
         echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
       fi
-      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port 7356 --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc"
+      GROPT="$NORAD --samp_rate $SAMP --iq --throttle --udp --udp_port $IQ_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc"
       echo "$PRG running in IQ mode at $SAMP sps"
     else
       SAMP=48000
-      GROPT="$NORAD --samp_rate $SAMP --throttle --udp --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --f_offset 12000"  # --clk_limit 0.03
+      GROPT="$NORAD --samp_rate $SAMP --throttle --udp --udp_port $AUDIO_PORT --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --f_offset 12000"  # --clk_limit 0.03
       echo "$PRG running in audio mode at $SAMP sps"
     fi
     gr_satellites $GROPT > "$LOG" 2>> "$LOG" &
