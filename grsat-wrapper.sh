@@ -45,6 +45,10 @@ else
         IQ_PORT=7356
 fi
 
+if [ -z ${UDP_DUMP_HOST} ]; then
+	echo "Warning: UDP_DUMP_HOST not set, no data will be sent to the demod"
+fi
+
 if [ ${CMD^^} == "START" ]; then
   if [ ! -f "$SATLIST" ]; then
     echo "$PRG Generating satellite list"
