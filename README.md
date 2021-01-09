@@ -88,7 +88,7 @@ Then update + apply, check the top of the screen that installed flowgraphs versi
 
 If the apply or update exits with an error like this, you need to re-install the .deb like described above.
 ````
-Install satnogs-flowgraphs...
+Install SatNOGS Flowgraphs...
   Retrying... (1 of 4)
 ````
 
@@ -113,8 +113,19 @@ Examples on how to use the UDP audio: https://gqrx.dk/doc/streaming-audio-over-u
 
 ## Deactivation/Uninstall
 
-To revert the installation, simply clear out the four variables with satnogs-setup:<br>
-`SATNOGS_CLIENT_URL SATNOGS_RADIO_FLOWGRAPHS_VERSION SATNOGS_PRE_OBSERVATION_SCRIPT SATNOGS_POST_OBSERVATION_SCRIPT`<br>
+To revert the installation, reinstall the original flowgraphs:<br>
+`sudo apt-get --allow-downgrades install satnogs-flowgraphs`<br>
+
+Then simply clear out the variables with satnogs-setup:<br>
+```
+SATNOGS_CLIENT_URL
+SATNOGS_RADIO_FLOWGRAPHS_VERSION
+SATNOGS_SETUP_ANSIBLE_URL
+SATNOGS_SETUP_ANSIBLE_BRANCH
+SATNOGS_SETUP_SATNOGS_CONFIG_URL
+SATNOGS_PRE_OBSERVATION_SCRIPT
+SATNOGS_POST_OBSERVATION_SCRIPT
+```
 Then update + apply.
 
 If you want to you can remove the scripts installed:<br>
