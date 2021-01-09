@@ -61,24 +61,35 @@ The GNU Radio UDP source need to have memory buffer increased for receiving more
 sudo cp udp.conf /etc/gnuradio/conf.d/
 ````
 
+Before running these changes, it is recommended that you are on the latest version.<br>
+To do this, run `sudo satnogs-setup` and run Update then Apply.<P>
+
 As of current version on the satnogs-flowgraphs 1.3-1 you will also need to replace the satnogs_*.py in /usr/bin<br>
-Check the current version with `dpkg -l satnogs-flowgraphs`
+Check the current version with `dpkg -l satnogs-flowgraphs`<br>
 Make sure you are already on version 1.3-1 before running the following commands:
 ````
 sudo dpkg -i satnogs-flowgraphs_1.3-1+sa2kng_all.deb
 ````
+
 Run `sudo satnogs-setup` and set the following parameters under Advanced -> Software:<br>
 SATNOGS_CLIENT_URL = `git+https://gitlab.com/knegge/satnogs-client.git@sa2kng_station`<br>
 SATNOGS_RADIO_FLOWGRAPHS_VERSION =  `1.3-1+sa2kng`<br>
-And enable pre/post observation scripts under Advanced -> Scripts:<br>
+SATNOGS_SETUP_ANSIBLE_URL = `https://gitlab.com/knegge/satnogs-client-ansible.git`<br>
+SATNOGS_SETUP_ANSIBLE_BRANCH = `udp_control`<br>
+SATNOGS_SETUP_SATNOGS_CONFIG_URL = `git+https://gitlab.com/knegge/satnogs-config.git@udp_control`<br>
+Then update + apply to install these versions.<P>
+
+Still in satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
 SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+Set the UDP destination under Advanced -> Radio:<br>
+UDP_DUMP_HOST = `127.0.0.1`<br>
+Then update + apply, check the top of the screen that installed flowgraphs version is now 1.3-1+sa2kng.<P>
 
-Then update + apply, check the installed version is now 1.3-1+sa2kng.
-The last thing to do is activating the UDP streams, for now this needs to be done manually after every run of satnogs-setup as the file is generated.
-In /etc/default/satnogs-client:
+If the apply or update exits with an error like this, you need to re-install the .deb like described above.
 ````
-UDP_DUMP_HOST="127.0.0.1"
+Install satnogs-flowgraphs...
+  Retrying... (1 of 4)
 ````
 
 ## Configuration options
