@@ -13,6 +13,9 @@ SCRIPT="$7"  # $7 script name, satnogs_bpsk.py
 PRG="gr-satellites:"
 TMP="/tmp/.satnogs"
 SATLIST="$TMP/grsat_list.txt"  # SATNOGS_APP_PATH
+GRSVER="$TMP/grsat_list.ver"
+GRSBIN=$(which gr_satellites)
+GRSTS="stat -c %Y $GRSBIN"
 LOG="$TMP/grsat_$ID.log"
 KSS="$TMP/grsat_$ID.kss"
 GRPID="$TMP/grsat_$SATNOGS_STATION_ID.pid"
@@ -50,9 +53,10 @@ if [ -z ${UDP_DUMP_HOST} ]; then
 fi
 
 if [ ${CMD^^} == "START" ]; then
-  if [ ! -f "$SATLIST" ]; then
+  if [ ! -f "$SATLIST" ] || [ ! -f "$GRSVER" ] || [ "$($GRSTS)" != "$(<"$GRSVER")" ]; then
     echo "$PRG Generating satellite list"
-    gr_satellites --list_satellites | sed  -n -Ee  's/.*NORAD[^0-9]([0-9]+).*/\1/p' > "$SATLIST"
+    $GRSBIN --list_satellites | sed  -n -Ee  's/.*NORAD[^0-9]([0-9]+).*/\1/p' > "$SATLIST"
+    $GRSTS > "$GRSVER"
   fi
 
   if grep -Fxq "$NORAD" "$SATLIST"; then
@@ -70,7 +74,7 @@ if [ ${CMD^^} == "START" ]; then
       GROPT="$NORAD --samp_rate $SAMP --throttle --udp --udp_port $AUDIO_PORT --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --f_offset 12000"  # --clk_limit 0.03
       echo "$PRG running in audio mode at $SAMP sps"
     fi
-    gr_satellites $GROPT > "$LOG" 2>> "$LOG" &
+    $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
     echo $! > "$GRPID"
   else
     echo "$PRG Satellite not supported"
