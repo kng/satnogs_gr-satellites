@@ -22,7 +22,7 @@ Basically this, ymmv:
 cd
 sudo apt-get install swig liborc-0.4-0 python3-pip feh
 sudo pip3 install --upgrade construct requests
-git clone --depth=1 https://github.com/daniestevez/gr-satellites.git
+git clone -b maint-3.8 --depth=1 https://github.com/daniestevez/gr-satellites.git
 cd gr-satellites
 mkdir build
 cd build
@@ -61,6 +61,7 @@ The GNU Radio UDP source need to have memory buffer increased for receiving more
 sudo cp udp.conf /etc/gnuradio/conf.d/
 ````
 
+## SatNOGS setup
 Before running these changes, it is recommended that you are on the latest version.<br>
 To do this, run `sudo satnogs-setup` and run Update then Apply.<P>
 
