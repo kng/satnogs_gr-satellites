@@ -62,6 +62,9 @@ sudo cp udp.conf /etc/gnuradio/conf.d/
 ````
 
 ## SatNOGS setup
+
+NOTE: changes are being merged to the upstream master, so these settings will slowly move to being simply experimental=True<P>
+
 Before running these changes, it is recommended that you are on the latest version.<br>
 To do this, run `sudo satnogs-setup` and run Update then Apply.<P>
 
@@ -73,7 +76,7 @@ sudo dpkg -i satnogs-flowgraphs_1.3-1+sa2kng_all.deb
 ````
 
 Run `sudo satnogs-setup` and set the following parameters under Advanced -> Software:<br>
-SATNOGS_CLIENT_URL = `git+https://gitlab.com/knegge/satnogs-client.git@sa2kng_station`<br>
+SATNOGS_CLIENT_URL = `git+https://gitlab.com/librespacefoundation/satnogs/satnogs-client.git@master`<br>
 SATNOGS_RADIO_FLOWGRAPHS_VERSION =  `1.3-1+sa2kng`<br>
 SATNOGS_SETUP_ANSIBLE_URL = `https://gitlab.com/knegge/satnogs-client-ansible.git`<br>
 SATNOGS_SETUP_ANSIBLE_BRANCH = `udp_control`<br>
