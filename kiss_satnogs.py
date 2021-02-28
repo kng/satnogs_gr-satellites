@@ -28,6 +28,8 @@
 
 import argparse
 import struct
+import base64
+import json
 
 from os import path
 from binascii import hexlify
@@ -87,6 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', action='store_true', help='Show summary of the file')
     parser.add_argument('-t', action='store_true', help='Show timestamps and datalength')
     parser.add_argument('-v', action='store_true', help='Add verbosity or hexlify')
+    parser.add_argument('-j', action='store_true', help='Output JSON PDU format instead of binary')
     args = parser.parse_args()
 
     try:
@@ -115,7 +118,7 @@ if __name__ == '__main__':
 
     else:
         for (timestamp, frame) in frame_tuples:
-            datafile = args.d + timestamp.strftime("%Y-%m-%dT%H-%M-%S_")
+            datafile = args.d + timestamp.strftime("%Y-%m-%dT%H-%M-%S_g")
             ext = 0
             while True:
                 if path.isfile(datafile+str(ext)):
@@ -125,7 +128,13 @@ if __name__ == '__main__':
                     break
             if args.v:
                 print('Output file: {}'.format(datafile))
-            with open(datafile, 'wb') as df:
-                df.write(frame)
+            if args.j:
+                data = {'decoder_name': 'gr-satellites',
+                        'pdu': base64.b64encode(frame).decode()}
+                with open(datafile, 'w') as df:
+                    json.dump(data, df, default=str)
+            else:
+                with open(datafile, 'wb') as df:
+                    df.write(frame)
         if args.v:
             print('{}: Wrote {} frames.'.format(args.i.name, len(frame_tuples)))
