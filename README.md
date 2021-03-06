@@ -20,7 +20,7 @@ The latest gr-satellites >=3.7.0-git with the --udp_raw and --ignore_unknown_arg
 Basically this, ymmv:
 ````
 cd
-sudo apt-get install swig liborc-0.4-0 python3-pip feh
+sudo apt-get install swig liborc-0.4-0 python3-pip feh cmake
 sudo pip3 install --upgrade construct requests
 git clone -b maint-3.8 --depth=1 https://github.com/daniestevez/gr-satellites.git
 cd gr-satellites
@@ -37,6 +37,9 @@ cd ssdv
 make
 sudo make install
 ````
+If you get the error: ModuleNotFoundError: No module named 'satellites'<br>
+You can add this to `~/.bashrc` : `export PYTHONPATH=/usr/local/lib/python3/dist-packages/`<br>
+
 
 Clone this repo and enter it:<br>
 ````
@@ -61,7 +64,21 @@ The GNU Radio UDP source need to have memory buffer increased for receiving more
 sudo cp udp.conf /etc/gnuradio/conf.d/
 ````
 
-## SatNOGS setup
+## SatNOGS setup, option 1: use experimental
+
+Note: For now not all the MR are accepted and some of the configuration needs to be done manually.
+
+Select the experimental branch of satnogs with `sudo satnogs-setup` and set EXPERIMENTAL to True under Advanced->Software, then run Update and Apply.<P>
+
+Still in satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
+SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+Select Apply and exit.
+
+Edit the configuration file `/etc/default/satnogs-client` and add this line to it: `UDP_DUMP_HOST="127.0.0.1"`<br>
+This will be removed every time satnogs-setup is run and applied, so you will need to re-add it.<br>
+
+## SatNOGS setup, option 2: install from my repos
 
 NOTE: changes are being merged to the upstream master, so these settings will slowly move to being simply experimental=True<P>
 
@@ -117,6 +134,8 @@ Examples on how to use the UDP audio: https://gqrx.dk/doc/streaming-audio-over-u
 
 ## Deactivation/Uninstall
 
+Note: reverting certain software with satnogs-client-ansible is not possible, for example going from experimental to stable is not supported.<br>
+
 To revert the installation, reinstall the original flowgraphs:<br>
 `sudo apt-get --allow-downgrades install satnogs-flowgraphs`<br>
 
@@ -129,6 +148,7 @@ SATNOGS_SETUP_ANSIBLE_BRANCH
 SATNOGS_SETUP_SATNOGS_CONFIG_URL
 SATNOGS_PRE_OBSERVATION_SCRIPT
 SATNOGS_POST_OBSERVATION_SCRIPT
+UDP_DUMP_HOST
 ```
 Then update + apply.
 
