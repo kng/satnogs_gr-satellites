@@ -49,14 +49,13 @@ cd satnogs_gr-satellites
 ````
 
 Make sure the individual programs work before you enable the automated process!<br>
-These are required: `jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py`<br>
-If you plan to run with IQ data, you also need: `find_samp_rate.py`<br>
-Copy the grsat-wrapper.sh, kiss_satnogs.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
+These are required: `jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py, find_samp_rate.py`<br>
+Copy the grsat-wrapper.sh, kiss_satnogs.py, find_samp_rate.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 
 ````
 sudo apt-get install jq
-sudo cp grsat-wrapper.sh kiss_satnogs.py satnogs-pre satnogs-post /usr/local/bin
-sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py
+sudo cp grsat-wrapper.sh kiss_satnogs.py find_samp_rate.py satnogs-pre satnogs-post /usr/local/bin
+sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py /usr/local/bin/find_samp_rate.py
 ````
 
 The GNU Radio UDP source need to have memory buffer increased for receiving more than the 48k audio stream, so if using IQ mode you will need to add the following:
