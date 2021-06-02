@@ -1,17 +1,15 @@
 # satnogs_gr-satellites
-First try on combining gr-satellites with the satnogs-client and satnogs-flowgraphs
+First try on combining gr-satellites with the satnogs-client and satnogs-flowgraphs.<br>
+Now finally completely integrated in satnogs stable client.
 
 ## Theory of operation
-The main idea is to implement the UDP audio output in the satnogs_xxxx.grc to get the same data that goes to the OGG out into a running gr_satellites in UDP mode, thereby decoding the telemetry live and hopefully be able to submit to the satnogs observations.<br>
-UDP data should be the same as GQRX produces and is supported directly with gr-satellites and some other programs<br>
-See this for more information on the UDP protocol and examples https://gqrx.dk/doc/streaming-audio-over-udp
+The main idea is to extract the doppler corrected IQ stream in the satnogs_xxxx.grc to get the same data that goes to the demod and audio output into a running gr_satellites in UDP raw mode, thereby decoding the telemetry live and hopefully be able to submit to the satnogs observations and other data aggregators.<br>
 
 The pre-obs script launches gr-satellites in the background and it’s output is directed to /tmp/.satnogs/grsat_ID.log, grsat_ID.kss<br>
 It also creates a list of supported sats in the temp dir for faster access between runs.<br>
 The post-obs stops the gr_satellites and looks for kiss data, parses and creates the necessary files for upload via the satnogs-client.
 
-So in short, the path implemented: satnogs-flowgraphs -> udp audio (gqrx) -> decoder -> kiss -> kiss_satnogs for the binary extraction -> satnogs-client posting to the db.<br>
-The newer version of the flowgraphs also has UDP IQ data on UDP_DUMP_PORT+1 (default 7356).
+So in short, the path implemented: satnogs-flowgraphs -> udp data -> demod -> kiss -> kiss_satnogs for the binary extraction -> satnogs-client posting to the db.<br>
 
 ## Installation
 Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
@@ -58,59 +56,19 @@ sudo cp grsat-wrapper.sh kiss_satnogs.py find_samp_rate.py satnogs-pre satnogs-p
 sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py /usr/local/bin/find_samp_rate.py
 ````
 
-The GNU Radio UDP source need to have memory buffer increased for receiving more than the 48k audio stream, so if using IQ mode you will need to add the following:
+The GNU Radio UDP source need to have memory buffer increased for receiving more than a ~48k stream, so will need to add the following:
 ````
 sudo cp udp.conf /etc/gnuradio/conf.d/
 ````
 
-## SatNOGS setup, option 1: use experimental
+## SatNOGS setup:
 
-Note: For now not all the MR are accepted and some of the configuration needs to be done manually.
-
-Select the experimental branch of satnogs with `sudo satnogs-setup` and set EXPERIMENTAL to True under Advanced->Software, then run Update and Apply.<P>
-
-Still in satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
+In satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
 SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-Select Apply and exit.
-
-Edit the configuration file `/etc/default/satnogs-client` and add this line to it: `UDP_DUMP_HOST="127.0.0.1"`<br>
-This will be removed every time satnogs-setup is run and applied, so you will need to re-add it.<br>
-
-## SatNOGS setup, option 2: install from my repos
-
-NOTE: changes are being merged to the upstream master, so these settings will slowly move to being simply experimental=True<P>
-
-Before running these changes, it is recommended that you are on the latest version.<br>
-To do this, run `sudo satnogs-setup` and run Update then Apply.<P>
-
-As of current version on the satnogs-flowgraphs 1.3-1 you will also need to replace the satnogs_*.py in /usr/bin<br>
-Check the current version with `dpkg -l satnogs-flowgraphs`<br>
-Make sure you are already on version 1.3-1 before running the following commands:
-````
-sudo dpkg -i satnogs-flowgraphs_1.3-1+sa2kng_all.deb
-````
-
-Run `sudo satnogs-setup` and set the following parameters under Advanced -> Software:<br>
-SATNOGS_CLIENT_URL = `git+https://gitlab.com/librespacefoundation/satnogs/satnogs-client.git@master`<br>
-SATNOGS_RADIO_FLOWGRAPHS_VERSION =  `1.3-1+sa2kng`<br>
-SATNOGS_SETUP_ANSIBLE_URL = `https://gitlab.com/knegge/satnogs-client-ansible.git`<br>
-SATNOGS_SETUP_ANSIBLE_BRANCH = `udp_control`<br>
-SATNOGS_SETUP_SATNOGS_CONFIG_URL = `git+https://gitlab.com/knegge/satnogs-config.git@udp_control`<br>
-Then update + apply to install these versions.<P>
-
-Still in satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
-SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-Set the UDP destination under Advanced -> Radio:<br>
+Under Advanced -> Radio settings:<br>
 UDP_DUMP_HOST = `127.0.0.1`<br>
-Then update + apply, check the top of the screen that installed flowgraphs version is now 1.3-1+sa2kng.<P>
-
-If the apply or update exits with an error like this, you need to re-install the .deb like described above.
-````
-Install SatNOGS Flowgraphs...
-  Retrying... (1 of 4)
-````
+This will enable the UDP output. Select Apply and exit.
 
 ## Configuration options
 
@@ -119,32 +77,21 @@ Inside the script `grsat-wrapper.sh` there's some options.
 # Settings
 KEEPLOGS=no       # yes = keep, all other = remove KSS LOG
 
-# if IQ mode set, then you also need find_samp_rate.py
-IQMODE=no          # yes = use IQ UDP data, all other = use audio UDP data
-
 # uncomment and populate SELECTED with space separated norad id's
 # to selectively submit data to the network
 # if it's unset it will send all KISS demoded data, with possible dupes
 SELECTED="39444 44830 43803 42017 44832 40074"
 ````
 
+Please note that enabling KEEPLOGS it will eventually fill up the filesystem, also these are by default stored in tmpfs and it means they will be removed at reboot.<br>
 It is also totally possible to add other demodulating software to the main script. Check the previous versions of the grsat-wrapper.sh to see some examples on how it worked in earlier releases.<br>
-Examples on how to use the UDP audio: https://gqrx.dk/doc/streaming-audio-over-udp
 
 ## Deactivation/Uninstall
 
 Note: reverting certain software with satnogs-client-ansible is not possible, for example going from experimental to stable is not supported.<br>
 
-To revert the installation, reinstall the original flowgraphs:<br>
-`sudo apt-get --allow-downgrades install satnogs-flowgraphs`<br>
-
-Then simply clear out the variables with satnogs-setup:<br>
+Clear out the variables with satnogs-setup:<br>
 ```
-SATNOGS_CLIENT_URL
-SATNOGS_RADIO_FLOWGRAPHS_VERSION
-SATNOGS_SETUP_ANSIBLE_URL
-SATNOGS_SETUP_ANSIBLE_BRANCH
-SATNOGS_SETUP_SATNOGS_CONFIG_URL
 SATNOGS_PRE_OBSERVATION_SCRIPT
 SATNOGS_POST_OBSERVATION_SCRIPT
 UDP_DUMP_HOST
@@ -185,3 +132,5 @@ https://gist.githubusercontent.com/kerel-fs/910738286c4fed9409550b4efb34cab6/raw
 Issues and features:<br>
 https://github.com/daniestevez/gr-satellites/issues/196<br>
 https://gitlab.com/librespacefoundation/satnogs/satnogs-client/-/issues/410
+
+<br>Final notes, this was a terrible experience and had I known better I would simply have posted patches for the files and left it at that. It took way too much time and effort to complete and did end up destroying my interest in the project. There were several good people involved and I leave them with the credit for getting me to push through with it. Ingen nämnd, ingen glömd.
