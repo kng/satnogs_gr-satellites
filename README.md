@@ -37,6 +37,18 @@ cd ssdv
 make
 sudo make install
 ````
+A simple check to see if gr_satellites is working is by executing: `gr_satellites --version`<br>
+This should give an output similar to this (the version can be different):
+
+```
+gr_satellites v3.9.0-git
+Copyright (C) 2020 Daniel Estevez
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+```
+
 If you get the error: ModuleNotFoundError: No module named 'satellites'<br>
 You can add this to `~/.bashrc` : `export PYTHONPATH=/usr/local/lib/python3/dist-packages/`<br>
 
