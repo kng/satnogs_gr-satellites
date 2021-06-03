@@ -1,4 +1,8 @@
+First thing to do is updating the client, documented [here](https://wiki.satnogs.org/SatNOGS_Client_Setup#Updating_SatNOGS_Client_Software).
+If you run in to problems please check [here](https://wiki.satnogs.org/Troubleshooting) for troubleshooting.<br>
+<br>
 Make sure to investigate if files already exists, versions changed, you already have pre/post-scripts etc. I will not be responsible for any problems so be careful when following this guide!<br>
+
 
 ## Prerequisites
 Follow the instruction on https://gr-satellites.readthedocs.io/en/latest/installation.html<br>
