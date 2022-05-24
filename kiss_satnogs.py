@@ -120,6 +120,8 @@ if __name__ == '__main__':
         for (timestamp, frame) in frame_tuples:
             datafile = args.d + timestamp.strftime("%Y-%m-%dT%H-%M-%S_g")
             ext = 0
+            if len(frame) == 0:
+                continue
             while True:
                 if path.isfile(datafile+str(ext)):
                     ext += 1
