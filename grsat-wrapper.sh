@@ -46,7 +46,7 @@ if [ -z "$UDP_DUMP_PORT" ]; then
 fi
 
 if [ "${CMD^^}" == "START" ]; then
-  if [ ! -f "$SATLIST" ] || [ ! -f "$GRSVER" ] || [ "$($GRSTS)" != "$(<"$GRSVER")" ]; then
+  if [ ! -s "$SATLIST" ] || [ ! -f "$GRSVER" ] || [ "$($GRSTS)" != "$(<"$GRSVER")" ]; then
     echo "$PRG Generating satellite list"
     $GRSBIN --list_satellites | sed  -n -Ee  's/.*NORAD[^0-9]([0-9]+).*/\1/p' > "$SATLIST"
     $GRSTS > "$GRSVER"
