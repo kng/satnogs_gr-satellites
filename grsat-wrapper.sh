@@ -92,7 +92,7 @@ if [ "${CMD^^}" == "STOP" ]; then
         rm -f "${TMP}/data_${ID}_"*.ssdv
         mv "${TMP}/data_${ID}_"* "$DATA"
       else
-        kiss_satnogs.py "$KSS" -d "${DATA}/data_${ID}_" >> "$LOG"
+        kiss_satnogs.py "$KSS" -j -d "${DATA}/data_${ID}_" >> "$LOG"
       fi
     else
       echo "$PRG not sending KISS data to network"
