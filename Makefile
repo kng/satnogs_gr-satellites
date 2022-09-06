@@ -12,4 +12,5 @@ install: grsat-wrapper.sh find_samp_rate.py kiss_satnogs.py satnogs-pre satnogs-
 	install -m 755 kiss_satnogs.py $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 satnogs-pre $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 satnogs-post $(DESTDIR)$(PREFIX)/bin/
+	install -d $(DESTDIR)/etc/gnuradio/conf.d/
 	install -m 644 udp.conf $(DESTDIR)/etc/gnuradio/conf.d/
