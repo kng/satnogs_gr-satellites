@@ -75,8 +75,8 @@ sudo cp udp.conf /etc/gnuradio/conf.d/
 ## SatNOGS setup
 
 In satnogs-setup; enable pre/post observation scripts under Advanced -> Scripts:<br>
-SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
-SATNOGS_POST_OBSERVATION_SCRIPT = <br>`/usr/local/bin/satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+SATNOGS_PRE_OBSERVATION_SCRIPT = <br>`satnogs-pre {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
+SATNOGS_POST_OBSERVATION_SCRIPT = <br>`satnogs-post {{ID}} {{FREQ}} {{TLE}} {{TIMESTAMP}} {{BAUD}} {{SCRIPT_NAME}}`<br>
 Under Advanced -> Radio settings:<br>
 UDP_DUMP_HOST = `127.0.0.1`<br>
 This will enable the UDP output. Select Apply and exit.
