@@ -59,16 +59,7 @@ if [ "${CMD^^}" == "START" ]; then
       SAMP=48000
       echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
     fi
-    GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc"
-    if [ "$NORAD" == "46276" ]; then  # UPMSat 2 46276
-      GROPT="$GROPT --disable_dc_block  --deviation 500 --clk_bw 0.15"
-    fi
-    if [ "$NORAD" == "48900" ]; then  # TUBIN 48900
-      GROPT="$GROPT --disable_dc_block"
-    fi
-    if [ "$NORAD" == "35933" ]; then  # BEESAT-1 35933
-      GROPT="$GROPT --clk_bw 0.3"
-    fi
+    GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc --satcfg"
     echo "$PRG running at $SAMP sps"
     $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
     echo $! > "$GRPID"
