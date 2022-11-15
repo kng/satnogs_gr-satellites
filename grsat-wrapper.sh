@@ -23,11 +23,17 @@ DATA="$TMP/data"   # SATNOGS_OUTPUT_PATH
 
 # Settings
 KEEPLOGS=no       # yes = keep, all other = remove KSS LOG
+if [ -n "$GRSAT_KEEPLOGS" ]; then
+    KEEPLOGS=$GRSAT_KEEPLOGS
+fi
 
 # uncomment and populate SELECTED with space separated norad id's
 # to selectively submit data to the network
 # if it's unset it will send all KISS demoded data, with possible dupes
 #SELECTED="39444 44830 43803 42017 44832 40074"
+if [ -n "$GRSAT_SELECTED" ]; then
+    SELECTED=$GRSAT_SELECTED
+fi
 
 #DATE format fudge Y-m-dTH-M-S to Y-m-dTH:M:S
 B=${DATE//-/:}
