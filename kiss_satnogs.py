@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
-# usage: kiss_satnogs.py [-h] [-d path] [-s] [-t] [-v] kiss-file
+# usage: kiss_satnogs.py [-h] [-d path] [-s] [-t] [-v] [-j] [-x] kiss-file
 #
 # Read "gr_satellites-formatted" KISS frames and output the timestamp and data.
 #
 # positional arguments:
 #   kiss-file   Input KISS File.
 #
-# optional arguments:
+# options:
 #   -h, --help  show this help message and exit
-#   -d path     Output data path
+#   -d path     Output data path, default: data_
 #   -s          Show summary of the file
 #   -t          Show timestamps and datalength
 #   -v          Add verbosity or hexlify
+#   -j          Output JSON PDU format instead of binary
+#   -x          Output GetKISS+ format instead of binary
 
 # Example:
 # $ wget https://ia601407.us.archive.org/31/items/satnogs-observation-2901793/satnogs_2901793_2020-09-28T20-41-08.ogg
@@ -90,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', action='store_true', help='Show timestamps and datalength')
     parser.add_argument('-v', action='store_true', help='Add verbosity or hexlify')
     parser.add_argument('-j', action='store_true', help='Output JSON PDU format instead of binary')
+    parser.add_argument('-x', action='store_true', help='Output GetKISS+ format instead of binary')
     args = parser.parse_args()
 
     try:
@@ -97,6 +100,9 @@ if __name__ == '__main__':
     except AssertionError:
         frame_tuples = 0
         print('ERROR: KISS file inconsistent')
+        exit(1)
+    if args.x and args.j:
+        print('ERROR: -x and -j cannot be used together!')
         exit(1)
 
     if args.s:
@@ -115,6 +121,17 @@ if __name__ == '__main__':
             if args.v:
                 print('{}:\n{}\n'.format(timestamp, hexlify(frame).decode('latin-1')))
         print('{}: Found {} frames.'.format(args.i.name, len(frame_tuples)))
+
+    elif args.x:
+        datafile = args.d + '.txt'
+        outfile = open(datafile, 'w')
+        if args.v:
+            print('Output file: {}'.format(datafile))
+        for (timestamp, frame) in frame_tuples:
+            if len(frame) == 0:
+                continue
+            outfile.write('{} | len: {} | {}\n'.format(timestamp.strftime('%Y-%m-%d %H:%M:%S'), len(frame),
+                                                       hexlify(frame).decode('ascii').upper()))
 
     else:
         for (timestamp, frame) in frame_tuples:
