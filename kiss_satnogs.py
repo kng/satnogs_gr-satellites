@@ -91,10 +91,10 @@ if __name__ == '__main__':
                                                  ' and output the timestamp and data.')
     parser.add_argument('i', metavar='kiss-file', type=argparse.FileType('rb'), help='Input KISS File.')
     parser.add_argument('-d', metavar='path', type=str, default='data_', help='Output data path, default: %(default)s')
-    parser.add_argument('-s', action='store_true', help='Show summary of the file')
-    parser.add_argument('-t', action='store_true', help='Show timestamps and datalength')
     parser.add_argument('-v', action='store_true', help='Add verbosity or hexlify')
     gr1 = parser.add_mutually_exclusive_group()
+    gr1.add_argument('-s', action='store_true', help='Show summary of the file')
+    gr1.add_argument('-t', action='store_true', help='Show timestamps and datalength')
     gr1.add_argument('-j', action='store_true', help='Output JSON PDU format instead of binary')
     gr1.add_argument('-x', action='store_true', help='Output GetKISS+ format instead of binary')
     args = parser.parse_args()
@@ -116,14 +116,14 @@ if __name__ == '__main__':
         print('{}: Found {} frames, total data {}, first timestamp {}'.format(args.i.name, len(frame_tuples),
                                                                               framelen, ts))
 
-    if args.t:
+    elif args.t:
         for (timestamp, frame) in frame_tuples:
             print('{} len: {}'.format(timestamp, len(frame)))
             if args.v:
                 print('{}:\n{}\n'.format(timestamp, hexlify(frame).decode('latin-1')))
         print('{}: Found {} frames.'.format(args.i.name, len(frame_tuples)))
 
-    if args.x:
+    elif args.x:
         datafile = args.d + '.txt'
         outfile = open(datafile, 'w')
         if args.v:
