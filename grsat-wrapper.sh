@@ -88,9 +88,10 @@ if [ "${CMD^^}" == "STOP" ]; then
         jy1sat_ssdv "$KSS" "${TMP}/data_${ID}_${DATE}" >> "$LOG"
         rm -f "${TMP}/data_${ID}_"*.ssdv
         mv "${TMP}/data_${ID}_"* "$DATA"
-      else
-        kiss_satnogs.py "$KSS" -j -d "${DATA}/data_${ID}_" >> "$LOG"
+      elif [ "$NORAD" == "53385" ]; then
+        kiss_geoscan.py "$KSS" "${DATA}/data_${ID}_"
       fi
+      kiss_satnogs.py "$KSS" -j -d "${DATA}/data_${ID}_" >> "$LOG"
     else
       echo "$PRG not sending KISS data to network"
     fi

@@ -5,11 +5,12 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
-install: grsat-wrapper.sh find_samp_rate.py kiss_satnogs.py satnogs-pre satnogs-post udp.conf
+install: grsat-wrapper.sh find_samp_rate.py kiss_satnogs.py kiss_geoscan.py satnogs-pre satnogs-post udp.conf
 	install -d $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 grsat-wrapper.sh $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 find_samp_rate.py $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 kiss_satnogs.py $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 kiss_geoscan.py $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 satnogs-pre $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 satnogs-post $(DESTDIR)$(PREFIX)/bin/
 	install -d $(DESTDIR)/etc/gnuradio/conf.d/
