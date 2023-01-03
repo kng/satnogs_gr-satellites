@@ -59,22 +59,25 @@ def read_kiss_frames(kf):
     parts = kf.read().split(FEND)
 
     # Check that content starts with FEND byte (First Frame start)
-    assert (parts[0] == b'')
+    assert (parts[0] == b''), 'does not begin with frame start'
 
     # Check that content is composed of (empty, timestamp, empty, frame_content)-frame tuples
     parts_len = len(parts)
-    assert ((parts_len - 1) % 4 == 0)
+    assert ((parts_len - 1) % 2 == 0), 'does not contain even number of frame tuples'
 
-    frames_len = (parts_len - 1) // 4
+    frames_len = (parts_len - 1) // 2
 
+    timestamp_raw = None
     for i in range(0, frames_len):
-        timestamp_raw = parts[i * 4 + 1]
-        escaped_frame = parts[i * 4 + 3]
+        if parts[i * 2 + 1][0] == 9:
+            timestamp_raw = parts[i * 2 + 1]
+            continue
+        escaped_frame = parts[i * 2 + 1]
 
-        # Make sure this is a KISS control frame (type = b'\x09')
-        assert (timestamp_raw[0] == 9)
+        # Make sure this is a time frame (type = b'\x09')
+        assert (timestamp_raw[0] == 9), 'timestamp is not type 9'
         # Make sure this is a data frame (type = b'\x00')
-        assert (escaped_frame[0] == 0)
+        assert (escaped_frame[0] == 0), 'data is not type 0'
 
         timestamp_int, = struct.unpack('>Q', kiss_unescape(timestamp_raw[1:]))
         epoch = datetime(1970, 1, 1)
@@ -88,21 +91,19 @@ if __name__ == '__main__':
                                                  ' and output the timestamp and data.')
     parser.add_argument('i', metavar='kiss-file', type=argparse.FileType('rb'), help='Input KISS File.')
     parser.add_argument('-d', metavar='path', type=str, default='data_', help='Output data path, default: %(default)s')
-    parser.add_argument('-s', action='store_true', help='Show summary of the file')
-    parser.add_argument('-t', action='store_true', help='Show timestamps and datalength')
     parser.add_argument('-v', action='store_true', help='Add verbosity or hexlify')
-    parser.add_argument('-j', action='store_true', help='Output JSON PDU format instead of binary')
-    parser.add_argument('-x', action='store_true', help='Output GetKISS+ format instead of binary')
+    gr1 = parser.add_mutually_exclusive_group()
+    gr1.add_argument('-s', action='store_true', help='Show summary of the file')
+    gr1.add_argument('-t', action='store_true', help='Show timestamps and datalength')
+    gr1.add_argument('-j', action='store_true', help='Output JSON PDU format instead of binary')
+    gr1.add_argument('-x', action='store_true', help='Output GetKISS+ format instead of binary')
     args = parser.parse_args()
 
     try:
         frame_tuples = list(read_kiss_frames(args.i))
-    except AssertionError:
+    except AssertionError as e:
         frame_tuples = 0
-        print('ERROR: KISS file inconsistent')
-        exit(1)
-    if args.x and args.j:
-        print('ERROR: -x and -j cannot be used together!')
+        print('ERROR: KISS file inconsistent: {}'.format(e))
         exit(1)
 
     if args.s:
