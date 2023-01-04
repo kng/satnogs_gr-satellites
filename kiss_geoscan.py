@@ -35,9 +35,14 @@ def main():
         exit(3)
 
     image = BytesIO()
+    offset = 16384  # old 32768
+    for row in frames:
+        if row[0:4] == '0100' and row[6:8] == '01':
+            offset = int((row[12:14] + row[10:12]), 16)
+            break
     for row in frames:
         cmd = row[0:4]
-        addr = int((row[12:14] + row[10:12]), 16) % 32768
+        addr = int((row[12:14] + row[10:12]), 16) - offset
         dlen = (int(row[4:6], 16) + 2) * 2
         payload = row[16:dlen]
         if cmd == '0100':
