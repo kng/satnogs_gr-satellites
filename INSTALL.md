@@ -59,12 +59,12 @@ sudo make install
 ## Installation (manual)
 Make sure the individual programs work before you enable the automated process!<br>
 These are required: `jq, gr_satellites, jy1sat_ssdv, ssdv, kiss_satnogs.py, find_samp_rate.py`<br>
-Copy the grsat-wrapper.sh, kiss_satnogs.py, find_samp_rate.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
+Copy the grsat-wrapper.sh, kiss_satnogs.py, kiss_geoscan.py, find_samp_rate.py, satnogs-pre and satnogs-post to /usr/local/bin<br>
 
 ```
 sudo apt-get install jq
-sudo cp grsat-wrapper.sh kiss_satnogs.py find_samp_rate.py satnogs-pre satnogs-post /usr/local/bin
-sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py /usr/local/bin/find_samp_rate.py
+sudo cp grsat-wrapper.sh kiss_satnogs.py kiss_geoscan.py find_samp_rate.py satnogs-pre satnogs-post /usr/local/bin
+sudo chmod 0755 /usr/local/bin/satnogs-post /usr/local/bin/satnogs-pre /usr/local/bin/grsat-wrapper.sh /usr/local/bin/kiss_satnogs.py /usr/local/bin/kiss_geoscan.py /usr/local/bin/find_samp_rate.py
 ```
 
 The GNU Radio UDP source need to have memory buffer increased for receiving more than a ~48k stream, so will need to add the following:
@@ -119,4 +119,4 @@ UDP_DUMP_HOST
 Then update + apply.
 
 If you want to you can remove the scripts installed:<br>
-`cd /usr/local/bin && sudo rm -f find_samp_rate.py grsat-wrapper.sh kiss_satnogs.py satnogs-post satnogs-pre`
+`cd /usr/local/bin && sudo rm -f find_samp_rate.py grsat-wrapper.sh kiss_satnogs.py kiss_geoscan.py satnogs-post satnogs-pre`
