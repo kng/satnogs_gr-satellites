@@ -7,6 +7,12 @@ from io import BytesIO
 from os import path
 import struct
 from sys import argv
+try:
+    from PIL import Image, ImageFile
+    png = True
+except ImportError:
+    png = False
+    pass
 
 
 def main():
@@ -40,22 +46,34 @@ def main():
         if row[0:4] == '0100' and row[6:8] == '01':
             offset = int((row[12:14] + row[10:12]), 16)
             break
-    for row in frames:
-        cmd = row[0:4]
-        addr = int((row[12:14] + row[10:12]), 16) - offset
-        dlen = (int(row[4:6], 16) + 2) * 2
-        payload = row[16:dlen]
-        if cmd == '0100':
-            image.seek(addr)
-            image.write(bytes.fromhex(payload))
+    try:
+        for row in frames:
+            cmd = row[0:4]
+            addr = int((row[12:14] + row[10:12]), 16) - offset
+            dlen = (int(row[4:6], 16) + 2) * 2
+            payload = row[16:dlen]
+            if cmd == '0100':
+                image.seek(addr)
+                image.write(bytes.fromhex(payload))
+    except ValueError as e:
+        print(f'ValueError: {e}')
 
     image.seek(0)
     if image.read(3) != b'\xff\xd8\xff':
         print('Wrong image beginning')
         exit(4)
 
-    with open(argv[2] + ts.strftime("%Y-%m-%dT%H-%M-%S") + '.jpg', 'wb') as f:
-        f.write(image.getbuffer().tobytes())
+    if png:
+        try:
+            ImageFile.LOAD_TRUNCATED_IMAGES = True
+            im = Image.open(image, formats=['JPEG'])
+            im.save(argv[2] + ts.strftime("%Y-%m-%dT%H-%M-%S") + '.png', format='PNG')
+        except Exception as e:
+            print(f'Write PNG exception: {e}')
+            exit(5)
+    else:
+        with open(argv[2] + ts.strftime("%Y-%m-%dT%H-%M-%S") + '.jpg', 'wb') as f:
+            f.write(image.getbuffer().tobytes())
 
 
 # kiss functions:
