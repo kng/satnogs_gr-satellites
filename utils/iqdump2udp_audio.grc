@@ -1,0 +1,577 @@
+options:
+  parameters:
+    author: sa2kng, some parts from satnogs_bpsk and satnogs_fm
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: 'replay iq.raw files to udp iq. Example use with: gr_satellites <sat>
+      --samp_rate  48000 --iq --udp --udp_raw --udp_port 57356'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: no_gui
+    hier_block_src_path: '.:'
+    id: iqdump2udp_audio
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: run
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: SatNOGS IQ dump to UDP IQ and audio
+    window_size: 2*1080,1080
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 20]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: analog_agc2_xx_0
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: 1e-3
+    comment: ''
+    decay_rate: 1e-3
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '0.5'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [64, 436.0]
+    rotation: 0
+    state: enabled
+- name: analog_agc2_xx_0_0
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: '0.01'
+    comment: ''
+    decay_rate: '0.001'
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '0.015'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [520, 436.0]
+    rotation: 0
+    state: enabled
+- name: analog_quadrature_demod_cf_0
+  id: analog_quadrature_demod_cf
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    gain: (2*math.pi*deviation)/audio_samp_rate
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [624, 652.0]
+    rotation: 0
+    state: enabled
+- name: audio_samp_rate
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: audio sample rate
+    short_id: a
+    type: eng_float
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [544, 60.0]
+    rotation: 0
+    state: enabled
+- name: blocks_complex_to_real_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [944, 424.0]
+    rotation: 180
+    state: enabled
+- name: blocks_file_source_0
+  id: blocks_file_source
+  parameters:
+    affinity: ''
+    alias: ''
+    begin_tag: pmt.PMT_NIL
+    comment: ''
+    file: raw_file
+    length: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    repeat: 'False'
+    type: short
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [256, 180.0]
+    rotation: 0
+    state: enabled
+- name: blocks_float_to_short_0
+  id: blocks_float_to_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '16384'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [944, 372.0]
+    rotation: 0
+    state: true
+- name: blocks_float_to_short_0_0
+  id: blocks_float_to_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '16384'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [984, 652.0]
+    rotation: 0
+    state: true
+- name: blocks_interleaved_short_to_complex_0
+  id: blocks_interleaved_short_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    swap: 'False'
+    vector_input: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [432, 212.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: 1/16768
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [624, 212.0]
+    rotation: 0
+    state: true
+- name: blocks_rotator_cc_0_0
+  id: blocks_rotator_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Add a frequency offset equal the baudrate
+
+      to move the audio representation of the
+
+      signal to the audable frequencies'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    phase_inc: 2.0 * math.pi * (if_freq / audio_samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [904, 468.0]
+    rotation: 0
+    state: enabled
+- name: blocks_throttle_1
+  id: blocks_throttle
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    ignoretag: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_second: int(samp_rate)
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [800, 212.0]
+    rotation: 0
+    state: enabled
+- name: blocks_udp_sink_0_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Complex float IQ stream
+
+      Use with:
+
+      gr_satellites <sat> --iq --udp --udp_raw --udp_port 57356 --samp_rate <samp_rate>'
+    eof: 'True'
+    ipaddr: udp_dump_host
+    port: udp_dump_port
+    psize: '1472'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1136, 188.0]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Same output as GQRX audio using SSB demodulation
+
+      Signal shifted up to if_freq
+
+      Use with:
+
+      gr_satellites <bpsk_sat> --udp --udp_port 57357 --samp_rate <audio_samp_rate>
+      --f_offset <if_freq>'
+    eof: 'True'
+    ipaddr: udp_dump_host
+    port: udp_dump_port+1
+    psize: '1472'
+    type: short
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1136, 348.0]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0_0_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Same output as GQRX audio using FM demodulation
+
+      Adjust deviation and max_modulation_freq
+
+      Use with:
+
+      gr_satellites <fsk_sat> --udp --udp_port 57358 --samp_rate <audio_samp_rate>'
+    eof: 'True'
+    ipaddr: udp_dump_host
+    port: udp_dump_port+2
+    psize: '1472'
+    type: short
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1144, 628.0]
+    rotation: 0
+    state: true
+- name: dc_blocker_xx_0_0
+  id: dc_blocker_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: '1024'
+    long_form: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: ff
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [824, 644.0]
+    rotation: 0
+    state: enabled
+- name: deviation
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: FM deviation (Hz)
+    short_id: ''
+    type: eng_float
+    value: 5e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [848, 60.0]
+    rotation: 0
+    state: true
+- name: if_freq
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: SSB IF frequency
+    short_id: i
+    type: eng_float
+    value: '12000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [704, 60.0]
+    rotation: 0
+    state: enabled
+- name: import_0
+  id: import
+  parameters:
+    alias: ''
+    comment: ''
+    imports: import math
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 148.0]
+    rotation: 0
+    state: enabled
+- name: low_pass_filter_0
+  id: low_pass_filter
+  parameters:
+    affinity: ''
+    alias: ''
+    beta: '6.76'
+    comment: 'Using the Carson bandwidth rule for filter width:
+
+      width = 2*(deviation + max_modulation_freq).
+
+      For the majority of FM transmissions we can expect
+
+      max_modulation_freq = 3000'
+    cutoff_freq: deviation+max_modulation_freq
+    decim: '1'
+    gain: '1'
+    interp: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: audio_samp_rate
+    type: fir_filter_ccf
+    width: '1000'
+    win: firdes.WIN_HAMMING
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 604.0]
+    rotation: 0
+    state: enabled
+- name: low_pass_filter_0_0
+  id: low_pass_filter
+  parameters:
+    affinity: ''
+    alias: ''
+    beta: '6.76'
+    comment: ''
+    cutoff_freq: 0.42*audio_samp_rate/2.0
+    decim: '1'
+    gain: '1'
+    interp: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: audio_samp_rate
+    type: fir_filter_ccf
+    width: 0.05 * audio_samp_rate
+    win: firdes.WIN_HAMMING
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [704, 420.0]
+    rotation: 0
+    state: enabled
+- name: max_modulation_freq
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: The highest frequency in the FM modulating signal
+    short_id: ''
+    type: eng_float
+    value: 3e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [992, 60.0]
+    rotation: 0
+    state: true
+- name: pfb_arb_resampler_xxx_0
+  id: pfb_arb_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    atten: '80'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nfilts: '32'
+    rrate: audio_samp_rate/samp_rate
+    samp_delay: '0'
+    taps: ''
+    type: ccf
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [248, 444.0]
+    rotation: 0
+    state: enabled
+- name: raw_file
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: Input file from satnogs iq dump
+    short_id: f
+    type: str
+    value: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [256, 60.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: sample rate
+    short_id: s
+    type: eng_float
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 60.0]
+    rotation: 0
+    state: enabled
+- name: udp_dump_host
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: host/ip to bind udp sink
+    short_id: u
+    type: str
+    value: '"127.0.0.1"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1168, 60.0]
+    rotation: 0
+    state: enabled
+- name: udp_dump_port
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: host port for udp sink
+    short_id: p
+    type: intx
+    value: '57356'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1328, 60.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_agc2_xx_0, '0', pfb_arb_resampler_xxx_0, '0']
+- [analog_agc2_xx_0_0, '0', low_pass_filter_0_0, '0']
+- [analog_quadrature_demod_cf_0, '0', dc_blocker_xx_0_0, '0']
+- [blocks_complex_to_real_0, '0', blocks_float_to_short_0, '0']
+- [blocks_file_source_0, '0', blocks_interleaved_short_to_complex_0, '0']
+- [blocks_float_to_short_0, '0', blocks_udp_sink_0_0_0_0, '0']
+- [blocks_float_to_short_0_0, '0', blocks_udp_sink_0_0_0_0_0, '0']
+- [blocks_interleaved_short_to_complex_0, '0', blocks_multiply_const_vxx_0, '0']
+- [blocks_multiply_const_vxx_0, '0', blocks_throttle_1, '0']
+- [blocks_rotator_cc_0_0, '0', blocks_complex_to_real_0, '0']
+- [blocks_throttle_1, '0', analog_agc2_xx_0, '0']
+- [blocks_throttle_1, '0', blocks_udp_sink_0_0_0, '0']
+- [blocks_throttle_1, '0', low_pass_filter_0, '0']
+- [dc_blocker_xx_0_0, '0', blocks_float_to_short_0_0, '0']
+- [low_pass_filter_0, '0', analog_quadrature_demod_cf_0, '0']
+- [low_pass_filter_0_0, '0', blocks_rotator_cc_0_0, '0']
+- [pfb_arb_resampler_xxx_0, '0', analog_agc2_xx_0_0, '0']
+
+metadata:
+  file_format: 1
