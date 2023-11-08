@@ -31,6 +31,8 @@ elif '_sstv' in script:
     print(4*4160*4)
 elif '_qubik' in script:
     print(max(4,satnogs.find_decimation(baudrate, 2, audio_samp_rate))*baudrate)
+elif '_apt' in script:
+    print(4*4160*4)
 else:  # cw, fm, afsk, etc...
     print(audio_samp_rate)
 
