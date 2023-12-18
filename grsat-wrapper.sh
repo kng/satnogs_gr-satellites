@@ -13,10 +13,7 @@ SCRIPT="$7"  # $7 script name, satnogs_bpsk.py
 PRG="gr-satellites:"
 TMP=${SATNOGS_APP_PATH:-/tmp/.satnogs}
 DATA=${SATNOGS_OUTPUT_PATH:-/tmp/.satnogs/data/}
-SATLIST="$TMP/grsat_list.txt"
-GRSVER="$TMP/grsat_list.ver"
 GRSBIN=$(command -v gr_satellites)
-GRSTS="stat -c %Y $GRSBIN"
 LOG="$TMP/grsat_$ID.log"
 KSS="$TMP/grsat_$ID.kss"
 GRPID="$TMP/grsat_$SATNOGS_STATION_ID.pid"
@@ -52,26 +49,16 @@ if [ -z "$UDP_DUMP_PORT" ]; then
 fi
 
 if [ "${CMD^^}" == "START" ]; then
-  if [ ! -s "$SATLIST" ] || [ ! -f "$GRSVER" ] || [ "$($GRSTS)" != "$(<"$GRSVER")" ]; then
-    echo "$PRG Generating satellite list"
-    $GRSBIN --list_satellites | sed  -n -Ee  's/.*NORAD[^0-9]([0-9]+).*/\1/p' > "$SATLIST"
-    $GRSTS > "$GRSVER"
+  echo "$PRG Starting observation $ID"
+  SAMP=$(find_samp_rate.py "$BAUD" "$SCRIPT")
+  if [ -z "$SAMP" ]; then  # default 48k if script not found
+    SAMP=48000
+    echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
   fi
-
-  if grep -Fxq "$NORAD" "$SATLIST"; then
-    echo "$PRG Starting observation $ID"
-    SAMP=$(find_samp_rate.py "$BAUD" "$SCRIPT")
-    if [ -z "$SAMP" ]; then  # default 48k if script not found
-      SAMP=48000
-      echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
-    fi
-    GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc --satcfg"
-    echo "$PRG running at $SAMP sps"
-    $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
-    echo $! > "$GRPID"
-  else
-    echo "$PRG Satellite not supported"
-  fi
+  GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc --satcfg"
+  echo "$PRG running at $SAMP sps"
+  $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
+  echo $! > "$GRPID"
 fi
 
 if [ "${CMD^^}" == "STOP" ]; then
