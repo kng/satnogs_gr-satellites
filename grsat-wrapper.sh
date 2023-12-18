@@ -11,15 +11,15 @@ BAUD="$6"    # $6 baudrate
 SCRIPT="$7"  # $7 script name, satnogs_bpsk.py
 
 PRG="gr-satellites:"
-TMP="/tmp/.satnogs"
-SATLIST="$TMP/grsat_list.txt"  # SATNOGS_APP_PATH
+TMP=${SATNOGS_APP_PATH:-/tmp/.satnogs}
+DATA=${SATNOGS_OUTPUT_PATH:-/tmp/.satnogs/data/}
+SATLIST="$TMP/grsat_list.txt"
 GRSVER="$TMP/grsat_list.ver"
 GRSBIN=$(command -v gr_satellites)
 GRSTS="stat -c %Y $GRSBIN"
 LOG="$TMP/grsat_$ID.log"
 KSS="$TMP/grsat_$ID.kss"
 GRPID="$TMP/grsat_$SATNOGS_STATION_ID.pid"
-DATA="$TMP/data"   # SATNOGS_OUTPUT_PATH
 
 # Settings
 KEEPLOGS=no       # yes = keep, all other = remove KSS LOG
