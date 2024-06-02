@@ -55,7 +55,7 @@ if [ "${CMD^^}" == "START" ]; then
     SAMP=48000
     echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
   fi
-  GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --use_agc --satcfg"
+  GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --satcfg"
   echo "$PRG running at $SAMP sps"
   $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
   echo $! > "$GRPID"
