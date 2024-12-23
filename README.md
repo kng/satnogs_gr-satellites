@@ -1,3 +1,7 @@
+# LEGACY
+Do note that this repository is considered legacy by now.<br>
+The new python version `grsat.py` is in my [addons](https://github.com/kng/satnogs-client-docker/tree/main/addons).
+
 # satnogs_gr-satellites
 First try on combining gr-satellites with the satnogs-client and satnogs-flowgraphs.<br>
 Now finally completely integrated in satnogs stable client.<br>
