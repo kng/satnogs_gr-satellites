@@ -42,6 +42,7 @@ echo "$PRG Observation: $ID, Norad: $NORAD, Name: $SATNAME, Script: $SCRIPT"
 
 if [ -z "$UDP_DUMP_HOST" ]; then
 	echo "Warning: UDP_DUMP_HOST not set, no data will be sent to the demod"
+  UDP_DUMP_HOST="0.0.0.0"
 fi
 
 if [ -z "$UDP_DUMP_PORT" ]; then
@@ -55,7 +56,7 @@ if [ "${CMD^^}" == "START" ]; then
     SAMP=48000
     echo "$PRG WARNING: find_samp_rate.py did not return valid sample rate!"
   fi
-  GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --satcfg"
+  GROPT="$NORAD --samp_rate $SAMP --iq --udp --udp_ip $UDP_DUMP_HOST --udp_port $UDP_DUMP_PORT --udp_raw --start_time $DATEF --kiss_out $KSS --ignore_unknown_args --satcfg"
   echo "$PRG running at $SAMP sps"
   $GRSBIN $GROPT > "$LOG" 2>> "$LOG" &
   echo $! > "$GRPID"
